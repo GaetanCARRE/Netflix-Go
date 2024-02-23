@@ -2,17 +2,31 @@ import { useState } from 'react'
 import { Dialog, Popover } from '@headlessui/react'
 import { CgMenuRightAlt, CgClose } from "react-icons/cg";
 import logo from '../assets/logo.png'
-import { Link, useNavigate, useOutletContext } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 
 
-export default function Header({jwtToken, setJwtToken}) {
+export default function Header({jwtToken, setJwtToken, toggleRefresh}) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const navigate = useNavigate();
-  
+
   const logout = () => {
-    setJwtToken('');
+    const requestOptions = {
+      method: "GET",
+      credentials: "include",
+    }
+
+    fetch(`/logout`, requestOptions)
+    .catch((error) => {
+      console.log("error logging out", error)
+    })
+    .finally(() => {
+      setJwtToken("");
+      toggleRefresh(false);
+    })
     navigate('/login');
   }
+
+
   return (
     <header className="bg-stone-900">
       <nav className="mx-auto flex max-w-7xl items-center justify-between p-6 lg:px-8" aria-label="Global">
@@ -45,19 +59,19 @@ export default function Header({jwtToken, setJwtToken}) {
           <Link to="/mylist" className="text-sm leading-6">
             My list
           </Link>
-          {jwtToken != '' ? (
+          {jwtToken !== '' ? (
             <>
               <Link to="/manage-catalog" className="text-sm leading-6">
                 Manage catalog
               </Link>
-              <Link to="/admin/movie" className="text-sm leading-6">
-                Manage catalog
+              <Link to="/admin/movie/0" className="text-sm leading-6">
+                Add movie
               </Link>
             </>
           ): null}
         </Popover.Group>
         <div className="hidden lg:flex lg:flex-1 lg:justify-end">
-          {jwtToken == '' ? (
+          {jwtToken === '' ? (
             <Link to="/login" className="text-sm leading-6">
               Log in <span aria-hidden="true">&rarr;</span>
             </Link>

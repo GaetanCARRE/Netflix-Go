@@ -14,6 +14,9 @@ import EditMovie from './components/EditMovie';
 import ManageCatalog from './components/ManageCatalog';
 import Login from './components/Login';
 import Movie from './components/Movie';
+import Genres from './components/Genres';
+import Genre from './components/Genre';
+import VideoPlayer from './components/VideoPlayer';
 
 const router = createBrowserRouter([
   {
@@ -29,6 +32,11 @@ const router = createBrowserRouter([
         path: '/movies',
         element: <Movies />,
       },
+      {
+        path: '/video',
+        element: <VideoPlayer />,
+      },
+
       {
         path: '/movies/:id',
         element: <Movie />,
@@ -54,7 +62,19 @@ const router = createBrowserRouter([
         element: <Series />
       },
       {
+        path: '/genres',
+        element: <Genres />
+      },
+      {
+        path: '/genre/:id',
+        element: <Genre />
+      },
+      {
         path: '/admin/movie/0',
+        element: <EditMovie />
+      },
+      {
+        path: '/admin/movie/:id',
         element: <EditMovie />
       },
       {
