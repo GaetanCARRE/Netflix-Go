@@ -9,20 +9,39 @@ export default function Login() {
     const [alertMesssage, setAlertMessage] = useState('');
     const [alertClass, setAlertClass] = useState('hidden');
     const navigate = useNavigate();
+    const { toggleRefresh } = useOutletContext();
     // const setJwtToken = ''
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        console.log("email/pass", email, password)
-        if (email === 'admin@goflix.com') {
-            setJwtToken("true");
-            setAlertClass('hidden');
-            setAlertMessage('');
-            navigate('/')
-        } else {
-            setAlertClass('alert alert-danger bg-white');
-            setAlertMessage('Invalid email/password');
+
+        let payload = {
+            email: email,
+            password: password
         }
+
+        const requestOptions = {
+            method: "POST",
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
+            body: JSON.stringify(payload),
+        }
+
+        fetch(`/authenticate`, requestOptions)
+            .then(response => response.json())
+            .then((data) => {
+                if (data.error) {
+                    setAlertClass("block");
+                    setAlertMessage(data.message);
+                } else
+                {
+                    setJwtToken(data.access_token);
+                    setAlertClass("hidden");
+                    setAlertMessage("");
+                    toggleRefresh(true);
+                    navigate('/')
+                }
+            })
     }
 
     return (
@@ -64,7 +83,7 @@ export default function Login() {
                                     Password
                                 </label>
                                 <div className="text-sm">
-                                    <a href="#" className="font-light text-gray-500 hover:text-green-500">
+                                    <a href="!#" className="font-light text-gray-500 hover:text-green-500">
                                         Forgot password?
                                     </a>
                                 </div>
