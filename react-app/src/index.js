@@ -34,7 +34,8 @@ const router = createBrowserRouter([
       },
       {
         path: '/video',
-        element: <VideoPlayer />,
+        element: <VideoPlayer
+        path="DeadPool.mp4" />,
       },
 
       {

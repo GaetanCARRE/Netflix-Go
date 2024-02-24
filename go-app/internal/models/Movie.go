@@ -13,6 +13,7 @@ type Movie struct {
 	UpdatedAt   time.Time `json:"-"`
 	Genres      []*Genre  `json:"genres"`
 	GenresArray []int     `json:"genres_array"`
+	VideoPath   string    `json:"video_path"`
 }
 
 type Genre struct {

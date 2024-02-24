@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
+import VideoPlayer from "./VideoPlayer";
 
 const Movie = () => {
     const [movie, setMovie] = useState({});
@@ -19,6 +20,7 @@ const Movie = () => {
             .then((data) => setMovie(data))
             .catch((error) => console.log(error));
     }, [id]);
+    console.log(movie);
 
     if (movie.genres) {
         movie.genres = Object.values(movie.genres);
@@ -43,6 +45,11 @@ const Movie = () => {
                     <img src={movie.image} alt={movie.title} width={200} />
                 </div>
             }
+            <div>
+                <VideoPlayer
+                    path={movie.video_path}
+                />
+            </div>
             <p> Description : {movie.description}</p>
         </div>
     );
