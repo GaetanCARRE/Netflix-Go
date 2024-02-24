@@ -71,7 +71,7 @@ func (m *PostgresDBRepo) OneMovie(id int) (*models.Movie, error) {
 	defer cancel()
 
 	query := `select id, title, release_date, runtime, 
-		description, coalesce(image, ''), created_at, updated_at
+		description, coalesce(image, ''), created_at, updated_at, coalesce(video_path, '')
 		from movies where id = $1`
 
 	row := m.DB.QueryRowContext(ctx, query, id)
@@ -87,6 +87,7 @@ func (m *PostgresDBRepo) OneMovie(id int) (*models.Movie, error) {
 		&movie.Image,
 		&movie.CreatedAt,
 		&movie.UpdatedAt,
+		&movie.VideoPath,
 	)
 
 	if err != nil {
