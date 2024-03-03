@@ -167,6 +167,17 @@ func (app *application) GetMovie(w http.ResponseWriter, r *http.Request) {
 	_ = app.writeJSON(w, http.StatusOK, movie)
 
 }
+
+func (app *application) GetRandomMovie(w http.ResponseWriter, r *http.Request) {
+	movie, err := app.DB.RandomMovie()
+	if err != nil {
+		app.errorJSON(w, err)
+		return
+	}
+
+	_ = app.writeJSON(w, http.StatusOK, movie)
+}
+
 func (app *application) MovieForEdit(w http.ResponseWriter, r *http.Request) {
 	id := chi.URLParam(r, "id")
 	movieID, err := strconv.Atoi(id)
@@ -240,7 +251,8 @@ func (app *application) getPoster(movie models.Movie) models.Movie {
 	type TheMovieDB struct {
 		Page    int `json:"page"`
 		Results []struct {
-			PosterPath string `json:"poster_path"`
+			PosterPath   string `json:"poster_path"`
+			BackdropPath string `json:"backdrop_path"`
 		} `json:"results"`
 		TotalPages int `json:"total_pages"`
 	}
@@ -274,6 +286,7 @@ func (app *application) getPoster(movie models.Movie) models.Movie {
 
 	if len(responseObject.Results) > 0 {
 		movie.Image = responseObject.Results[0].PosterPath
+		movie.Backdrop = responseObject.Results[0].BackdropPath
 	}
 
 	return movie
@@ -298,6 +311,7 @@ func (app *application) UpdateMovie(w http.ResponseWriter, r *http.Request) {
 	movie.Image = payload.Image
 	movie.RunTime = payload.RunTime
 	movie.UpdatedAt = time.Now()
+	movie.Type = payload.Type
 
 	err = app.DB.UpdateMovie(*movie)
 	if err != nil {

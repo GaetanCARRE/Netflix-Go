@@ -9,11 +9,13 @@ type Movie struct {
 	RunTime     int       `json:"runtime"`
 	Description string    `json:"description"`
 	Image       string    `json:"image"`
+	Backdrop    string    `json:"backdrop"`
 	CreatedAt   time.Time `json:"-"`
 	UpdatedAt   time.Time `json:"-"`
 	Genres      []*Genre  `json:"genres"`
 	GenresArray []int     `json:"genres_array"`
 	VideoPath   string    `json:"video_path"`
+	Type        string    `json:"type"`
 }
 
 type Genre struct {

@@ -8,6 +8,7 @@ import (
 type DatabaseRepo interface {
 	Connection() *sql.DB
 	AllMovies(genre ...int) ([]*models.Movie, error)
+	RandomMovie() (*models.Movie, error)
 	GetUserByEmail(email string) (*models.User, error)
 	GetUserByID(id int) (*models.User, error)
 	OneMovieForEdit(id int) (*models.Movie, []*models.Genre, error)

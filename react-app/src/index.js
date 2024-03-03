@@ -16,7 +16,6 @@ import Login from './components/Login';
 import Movie from './components/Movie';
 import Genres from './components/Genres';
 import Genre from './components/Genre';
-import VideoPlayer from './components/VideoPlayer';
 
 const router = createBrowserRouter([
   {
@@ -32,12 +31,6 @@ const router = createBrowserRouter([
         path: '/movies',
         element: <Movies />,
       },
-      {
-        path: '/video',
-        element: <VideoPlayer
-        path="DeadPool.mp4" />,
-      },
-
       {
         path: '/movies/:id',
         element: <Movie />,
@@ -90,6 +83,7 @@ const router = createBrowserRouter([
   }
 ]
 );
+
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>

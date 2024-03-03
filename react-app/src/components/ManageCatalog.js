@@ -3,6 +3,7 @@ import { Link, useNavigate ,useOutletContext } from "react-router-dom";
 const ManageCatalog = () => {
     const [movies, setMovies] = useState([])
     const { jwtToken } = useOutletContext();
+    console.log("jwtToken: ", jwtToken);
     const navigate = useNavigate();
     useEffect(() => {
         if (jwtToken === "") {
@@ -23,11 +24,11 @@ const ManageCatalog = () => {
     }, [jwtToken, navigate]);
 
     return (
-        <div>
-            <h1>Manageeee Catalogue</h1>
+        <div className="mx-20">
+            <h1 className="text-3xl text-center py-8">Manage Catalog</h1>
 
 
-            <div className="relative overflow-x-auto shadow-md sm:rounded-lg">
+            <div className="relative overflow-x-auto shadow-md rounded-xl">
                 <table className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
                     <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
                         <tr>

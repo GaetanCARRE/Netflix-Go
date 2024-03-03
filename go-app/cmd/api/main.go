@@ -13,15 +13,16 @@ import (
 const port = 8080
 
 type application struct {
-	DSN          string
-	Domain       string
-	DB           repository.DatabaseRepo
-	auth         Auth
-	JWTSecret    string
-	JWTIssuer    string
-	JWTAudience  string
-	CookieDomain string
-	APIKey       string
+	DSN              string
+	Domain           string
+	DB               repository.DatabaseRepo
+	auth             Auth
+	JWTSecret        string
+	JWTIssuer        string
+	JWTAudience      string
+	CookieDomain     string
+	APIKey           string
+	VideoStoragePath string
 }
 
 func main() {
@@ -36,6 +37,7 @@ func main() {
 	flag.StringVar(&app.CookieDomain, "cookie-domain", "localhost", "cookie domain")
 	flag.StringVar(&app.Domain, "domain", "example.com", "domain")
 	flag.StringVar(&app.APIKey, "api-key", "74925a575641b207c968b1444138ef84", "api key")
+	flag.StringVar(&app.VideoStoragePath, "video-storage-path", "../../videos", "path to video storage")
 	flag.Parse()
 
 	// connect to the database

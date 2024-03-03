@@ -35,6 +35,7 @@ const EditMovie = () => {
         description: "",
         genres: [],
         genres_array: Array(13).fill(false),
+        type: "movie",
     })
 
     useEffect(() => {
@@ -53,6 +54,7 @@ const EditMovie = () => {
                 description: "",
                 genres: [],
                 genres_array: Array(13).fill(false),
+                type: "movie",
             })
 
             const headers = new Headers();
@@ -231,6 +233,15 @@ const EditMovie = () => {
         })
     }
 
+    const handleOptionChange = (event) => {
+        setMovie({
+            ...movie,
+            type: event.target.value,
+        })
+    };
+
+
+
     const confirmDelete = () => {
         Swal.fire({
             title: 'Delete movie?',
@@ -264,19 +275,31 @@ const EditMovie = () => {
         })
     }
     if (error !== null) {
-        return <div>Error: {error.message}</div>
+        return <div className="text-4xl text-center m-20">Error: {error.message}</div>
     }
     else {
         return (
-            <div>
-                <h2>Add/Edit Movie</h2>
-                <hr />
-                {/* <pre>{JSON.stringify(movie, null, 3)}</pre> */}
+            <div className="mx-20 text-xl">
+                <h2 className="text-4xl text-center py-8">Add/Edit Movie</h2>
+                <hr className="py-8"/>
 
                 <form onSubmit={handleSubmit}>
 
                     <input type="hidden" name="id" defaultValue={movie.id} id="id"></input>
+                    <input
+                        type="radio"
+                        value="movie"
+                        checked={movie.type === "movie"}
+                        onChange={(event) => handleOptionChange(event)}
+                    /> Movie
+                    <br />
+                    <input
+                        type="radio"
+                        value="serie"
+                        checked={movie.type === "serie"}
+                        onChange={(event) => handleOptionChange(event)}
 
+                    /> Series
                     <Input
                         title={"Title"}
                         className={"form-control"}
@@ -320,11 +343,11 @@ const EditMovie = () => {
                         errorDiv={hasError("description") ? "text-danger" : "d-none"}
                     />
 
-                    <hr />
+                    <hr className="my-8"/>
 
-                    <h3>Genres</h3>
+                    <h3 className="mb-5">Genres</h3>
                     {movie.genres && movie.genres.length > 1 &&
-                        <>
+                        <div className="flex justify-center">
                             {Array.from(movie.genres).map((g, index) =>
                                 <CheckBox
                                     title={g.genre}
@@ -336,22 +359,23 @@ const EditMovie = () => {
                                     checked={movie.genres[index].checked}
                                 />
                             )}
-                        </>
+                        </div>
                     }
 
-                    <hr />
+                    <hr className="my-8"/>
 
-                    <button 
-                        className="hover:bg-transparent bg-blue-500 hover:text-blue-700 hover:font-semibold text-white py-2 px-4 hover:border hover:border-blue-500 border-transparent rounded"
+
+                    <button
+                        className="bg-blue-500 hover:font-semibold text-white py-2 px-4 hover:border hover:border-blue-500 border-transparent rounded mr-2"
                         type="submit"
                     >
                         Save
                     </button>
                     {movie.id > 0 && (
                         <a
-                            href="!#"
+                            href="#!"
                             type="button"
-                            className="hover:bg-transparent bg-red-500 hover:text-red-700 hover:font-semibold text-white py-2 px-4 hover:border hover:border-red-500 border-transparent rounded"
+                            className="bg-red-500 hover:font-semibold text-white py-2 px-4 hover:border hover:border-red-500 border-transparent rounded"
                             onClick={confirmDelete}
                         >
                             Delete

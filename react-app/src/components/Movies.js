@@ -1,7 +1,12 @@
 import { useEffect, useState } from "react";
+import MoviesMap from "./MoviesMap";
+import { IoChevronDown, IoChevronUp } from "react-icons/io5";
 import { Link } from "react-router-dom";
+
 const Movies = () => {
     const [movies, setMovies] = useState([])
+    const [genres, setGenres] = useState([])
+    const [showGenres, setShowGenres] = useState(false)
 
     useEffect(() => {
         const headers = new Headers();
@@ -10,48 +15,59 @@ const Movies = () => {
             method: 'GET',
             headers: headers,
         };
-        fetch(`http://localhost:8080/movies`, requestOptions)
-        .then(response => response.json())
-        .then(data => setMovies(data))
-        .catch(error => console.log(error));
+        fetch(`/movies`, requestOptions)
+            .then(response => response.json())
+            .then(data => setMovies(data))
+            .catch(error => console.log(error));
+
+        fetch(`/genres`, requestOptions)
+            .then(res => res.json())
+            .then(data => setGenres(data))
+            .catch((error) => {
+                console.log(error)
+            })
     }, []);
+    console.log(movies);
+
+
 
     return (
-        <div>
-            <h1>Movies</h1>
+        <div className="py-6 px-12">
+            {/* <h1 className="text-4xl px-12">Movies</h1> */}
+            <div
+                className="flex items-center border solid mt-5 text-2xl gap-6 w-min rounded p-2"
+                onClick={() => setShowGenres(!showGenres)}
+            >
+                <div>Genres</div>
+                <div>
+                    {showGenres ? <IoChevronUp /> : <IoChevronDown />}
 
+                </div>
 
-            <div className="relative overflow-x-auto shadow-md sm:rounded-lg">
-                <table className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
-                    <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
-                        <tr>
-                            <th scope="col" className="px-6 py-3">
-                                title
-                            </th>
-                            <th scope="col" className="px-6 py-3">
-                                director
-                            </th>
-                            <th scope="col" className="px-6 py-3">
-                                runtime
-                            </th>
-                        </tr>
-                    </thead>
-                    <tbody className="bg-white divide-y dark:divide-gray-700 dark:bg-gray-800">
-                        {movies.map((movie) => (
-                            <tr key={movie.id}>
-                                <td className="px-6 py-4 whitespace-nowrap">
-                                    <Link to={`/movies/${movie.id}`}>{movie.title}
-                                    </Link>
-                                </td>
-                                <td className="px-6 py-4 whitespace-nowrap">{movie.director}</td>
-                                <td className="px-6 py-4 whitespace-nowrap">{movie.runtime}</td>
-                            </tr>))}
-                    </tbody>
-                </table>
             </div>
+            {showGenres && (
+                <div className="absolute grid grid-cols-4 border border-gray-600 rounded p-2 w-1/3 bg-black bg-opacity-90 z-10">
+                    {genres.map((g) => (
+                        <Link
+                            key={g.id}
+                            to={`/genre/${g.id}`}
+                            state={
+                                {
+                                    genreName: g.genre
+                                }
+                            }
+                        >
+                            {g.genre}
+                        </Link>
+                    ))}
+                </div>
+            )}
+            <MoviesMap movies={movies} />
 
         </div>
     );
+
 }
 
 export default Movies;
+
