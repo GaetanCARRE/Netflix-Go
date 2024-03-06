@@ -178,6 +178,21 @@ func (app *application) GetRandomMovie(w http.ResponseWriter, r *http.Request) {
 	_ = app.writeJSON(w, http.StatusOK, movie)
 }
 
+func (app *application) GetLatestMovies(w http.ResponseWriter, r *http.Request) {
+	movie_count := r.URL.Query().Get("count")
+	count, err := strconv.Atoi(movie_count)
+	if err != nil {
+		count = 10
+	}
+	movies, err := app.DB.LatestMovies(count)
+	if err != nil {
+		app.errorJSON(w, err)
+		return
+	}
+
+	_ = app.writeJSON(w, http.StatusOK, movies)
+}
+
 func (app *application) MovieForEdit(w http.ResponseWriter, r *http.Request) {
 	id := chi.URLParam(r, "id")
 	movieID, err := strconv.Atoi(id)
@@ -362,6 +377,22 @@ func (app *application) AllMoviesByGenre(w http.ResponseWriter, r *http.Request)
 	}
 
 	movies, err := app.DB.AllMovies(id)
+	if err != nil {
+		app.errorJSON(w, err)
+		return
+	}
+
+	app.writeJSON(w, http.StatusOK, movies)
+}
+
+func (app *application) SearchMovies(w http.ResponseWriter, r *http.Request) {
+	query := r.URL.Query().Get("q")
+	if query == "" {
+		app.errorJSON(w, errors.New("missing search query"), http.StatusBadRequest)
+		return
+	}
+
+	movies, err := app.DB.SearchMovies(query)
 	if err != nil {
 		app.errorJSON(w, err)
 		return

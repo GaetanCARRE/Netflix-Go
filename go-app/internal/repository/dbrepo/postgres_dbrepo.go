@@ -159,7 +159,7 @@ func (m *PostgresDBRepo) OneMovie(id int) (*models.Movie, error) {
 	defer cancel()
 
 	query := `select id, title, release_date, runtime, 
-		description, coalesce(image, ''), created_at, updated_at, coalesce(video_path, ''), coalesce(backdrop, '')
+		description, coalesce(image, ''), coalesce(backdrop, ''), created_at, updated_at, coalesce(video_path, '')
 		from movies where id = $1`
 
 	row := m.DB.QueryRowContext(ctx, query, id)
@@ -390,7 +390,7 @@ func (m *PostgresDBRepo) InsertMovie(movie models.Movie) (int, error) {
 	defer cancel()
 
 	stmt := `insert into movies (title, description, release_date, runtime, created_at, updated_at, image, type, backdrop)
-			values ($1, $2, $3, $4, $5, $6, $7, $8) returning id`
+			values ($1, $2, $3, $4, $5, $6, $7, $8, $9) returning id`
 
 	var newID int
 
@@ -478,4 +478,152 @@ func (m *PostgresDBRepo) DeleteMovie(id int) error {
 	}
 
 	return nil
+}
+
+func (m *PostgresDBRepo) LatestMovies(count int) ([]*models.Movie, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), dbTimeout)
+	defer cancel()
+
+	query := fmt.Sprintf(`
+		select
+			id, title, release_date, runtime, description, coalesce(image, ''), coalesce(backdrop, ''),
+			created_at, updated_at
+		from
+			movies
+		order by
+			created_at desc
+		limit %d
+	`, count)
+
+	rows, err := m.DB.QueryContext(ctx, query)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var movies []*models.Movie
+
+	for rows.Next() {
+		var movie models.Movie
+		err := rows.Scan(
+			&movie.ID,
+			&movie.Title,
+			&movie.ReleaseDate,
+			&movie.RunTime,
+			&movie.Description,
+			&movie.Image,
+			&movie.Backdrop,
+			&movie.CreatedAt,
+			&movie.UpdatedAt,
+		)
+		if err != nil {
+			return nil, err
+		}
+
+		query = `select g.id, g.genre from movies_genres mg
+				left join genres g on (mg.genre_id = g.id)
+				where mg.movie_id = $1
+				order by g.genre`
+
+		rows, err := m.DB.QueryContext(ctx, query, movie.ID)
+		if err != nil && err != sql.ErrNoRows {
+			return nil, err
+		}
+		defer rows.Close()
+
+		var genres []*models.Genre
+		for rows.Next() {
+			var g models.Genre
+			err := rows.Scan(
+				&g.ID,
+				&g.Genre,
+			)
+			if err != nil {
+				return nil, err
+			}
+
+			genres = append(genres, &g)
+		}
+
+		movie.Genres = genres
+
+		movies = append(movies, &movie)
+	}
+
+	return movies, nil
+
+}
+
+func (m *PostgresDBRepo) SearchMovies(search string) ([]*models.Movie, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), dbTimeout)
+	defer cancel()
+
+	query := fmt.Sprintf(`
+		select
+			id, title, release_date, runtime, description, coalesce(image, ''), coalesce(backdrop, ''),
+			created_at, updated_at
+		from
+			movies
+		where
+			title ilike '%%%s%%'
+		order by
+			title
+	`, search)
+
+	rows, err := m.DB.QueryContext(ctx, query)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var movies []*models.Movie
+
+	for rows.Next() {
+		var movie models.Movie
+		err := rows.Scan(
+			&movie.ID,
+			&movie.Title,
+			&movie.ReleaseDate,
+			&movie.RunTime,
+			&movie.Description,
+			&movie.Image,
+			&movie.Backdrop,
+			&movie.CreatedAt,
+			&movie.UpdatedAt,
+		)
+		if err != nil {
+			return nil, err
+		}
+
+		query = `select g.id, g.genre from movies_genres mg
+				left join genres g on (mg.genre_id = g.id)
+				where mg.movie_id = $1
+				order by g.genre`
+
+		rows, err := m.DB.QueryContext(ctx, query, movie.ID)
+		if err != nil && err != sql.ErrNoRows {
+			return nil, err
+		}
+		defer rows.Close()
+
+		var genres []*models.Genre
+		for rows.Next() {
+			var g models.Genre
+			err := rows.Scan(
+				&g.ID,
+				&g.Genre,
+			)
+			if err != nil {
+				return nil, err
+			}
+
+			genres = append(genres, &g)
+		}
+
+		movie.Genres = genres
+
+		movies = append(movies, &movie)
+	}
+
+	return movies, nil
 }
