@@ -2,6 +2,9 @@ import { useLocation, useParams } from "react-router-dom"
 import { useEffect, useState } from "react"
 import { Link } from "react-router-dom"
 import MoviesMap from "./MoviesMap"
+import Header from "./Header"
+import { IoChevronForward } from "react-icons/io5";
+
 const Genre = () => {
 
     const location = useLocation();
@@ -36,10 +39,24 @@ const Genre = () => {
     }, [id])
 
     return (
-        <div>
-            <h1>{genreName}</h1>
-            <MoviesMap movies={movies} />
-        </div>
+        <>
+            <Header />
+            <div className="px-12">
+                <div
+                    className="flex flex-row items-center py-8"
+                >
+                    <h2 className="text-gray-400">
+                        <Link to="/movies" className="text-gray-400">
+                            movie
+                        </Link>
+                    </h2>
+                    <IoChevronForward className="text-gray-400" />
+                    <h1 className="text-4xl">{genreName} movie</h1>
+                </div>
+                <MoviesMap movies={movies} />
+            </div>
+        </>
+
     )
 }
 

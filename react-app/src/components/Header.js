@@ -1,13 +1,19 @@
 import { useState } from 'react'
 import { Dialog, Popover } from '@headlessui/react'
-import { CgMenuRightAlt, CgClose } from "react-icons/cg";
+import { CgMenuRightAlt, CgClose, CgNpm } from "react-icons/cg";
 import logo from '../assets/logo.png'
 import { Link, useNavigate } from 'react-router-dom'
+import { useOutletContext } from 'react-router-dom'
+import { IoSearch } from "react-icons/io5";
+import Search from './Search';
 
-
-export default function Header({jwtToken, setJwtToken, toggleRefresh}) {
+export default function Header(props) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const navigate = useNavigate();
+  const { jwtToken, setJwtToken, toggleRefresh } = useOutletContext();
+
+
+
 
   const logout = () => {
     const requestOptions = {
@@ -16,22 +22,22 @@ export default function Header({jwtToken, setJwtToken, toggleRefresh}) {
     }
 
     fetch(`/logout`, requestOptions)
-    .catch((error) => {
-      console.log("error logging out", error)
-    })
-    .finally(() => {
-      setJwtToken("");
-      toggleRefresh(false);
-    })
+      .catch((error) => {
+        console.log("error logging out", error)
+      })
+      .finally(() => {
+        setJwtToken("");
+        toggleRefresh(false);
+      })
     navigate('/login');
   }
 
 
   return (
-    <header className="bg-stone-900">
+    <header className={`bg-stone-900 ${props.className}`}>
       <nav className="mx-auto flex max-w-7xl items-center justify-between p-6 lg:px-8" aria-label="Global">
         <div className="flex lg:flex-1">
-          <Link to="#" className="-m-1.5 p-1.5">
+          <Link to="/" className="-m-1.5 p-1.5">
             <span className="sr-only">GoFlix</span>
             <img className="h-8 w-auto" src={logo} alt="logo" />
           </Link>
@@ -68,9 +74,10 @@ export default function Header({jwtToken, setJwtToken, toggleRefresh}) {
                 Add movie
               </Link>
             </>
-          ): null}
+          ) : null}
         </Popover.Group>
-        <div className="hidden lg:flex lg:flex-1 lg:justify-end">
+        <div className="hidden lg:flex lg:flex-1 lg:justify-end lg:items-center">
+
           {jwtToken === '' ? (
             <Link to="/login" className="text-sm leading-6">
               Log in <span aria-hidden="true">&rarr;</span>
@@ -80,6 +87,9 @@ export default function Header({jwtToken, setJwtToken, toggleRefresh}) {
               Log out <span aria-hidden="true">&rarr;</span>
             </div>
           )}
+          <Link to="/search" className="text-sm leading-6">
+            <IoSearch className="text-white" />
+          </Link>
         </div>
       </nav>
       <Dialog as="div" className="lg:hidden" open={mobileMenuOpen} onClose={setMobileMenuOpen}>

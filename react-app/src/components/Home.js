@@ -1,6 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Header from './Header';
-
+import { HiOutlineVolumeOff } from "react-icons/hi";
+import { HiOutlineVolumeUp } from "react-icons/hi";
+import { FaPlay } from "react-icons/fa";
+import { Link } from 'react-router-dom';
+import { LuInfo } from "react-icons/lu";
+import MovieInfo from './MovieInfo';
+import MoviesMap from './MoviesMap';
 
 
 const Home = () => {
@@ -8,13 +14,26 @@ const Home = () => {
     const [videoUrl, setVideoUrl] = useState('');
     const [isMuted, setIsMuted] = useState(true);
     const videoRef = useRef(null);
+    const [clicked, setClicked] = useState(false);
+    const [movies, setMovies] = useState([])
+    const [genres, setGenres] = useState([])
 
+    console.log(movie);
     const handleMute = () => {
         setIsMuted(!isMuted);
         if (videoRef.current) {
             videoRef.current.muted = !videoRef.current.muted;
         }
     };
+
+    const handleMovieClick = () => {
+        setClicked(true);
+    }
+
+    const handleClose = () => {
+        setClicked(false);
+    };
+
 
     const fetchMovie = async () => {
         try {
@@ -52,30 +71,93 @@ const Home = () => {
         }
     }, [movie.id]);
 
+    useEffect(() => {
+        const headers = new Headers();
+        headers.append('Content-Type', 'application/json');
+        const requestOptions = {
+            method: 'GET',
+            headers: headers,
+        };
+        fetch(`/latest?count=6`, requestOptions)
+            .then(response => response.json())
+            .then(data => setMovies(data))
+            .catch(error => console.log(error));
+
+        fetch(`/genres`, requestOptions)
+            .then(res => res.json())
+            .then(data => setGenres(data))
+            .catch((error) => {
+                console.log(error)
+            })
+    }, []);
+
     if (movie.genres) {
         movie.genres = Object.values(movie.genres);
     } else {
         movie.genres = [];
     }
 
+
     return (
-        <>
-        <div className='fixed w-full leading-[0px] top-0'>
-            <Header className='relative' /> 
-            {videoUrl && (
-                <div className="absolute top-0">
-                    <video ref={videoRef} autoPlay muted={isMuted} className="w-full leading-[0px]">
-                        <source src={videoUrl} type="video/mp4" />
-                        Your browser does not support the video tag.
-                    </video>
-                    <div className="absolute bottom-0 w-full h-1/2 bg-gradient-to-b from-transparent to-stone-950"></div>
-                    <button onClick={handleMute} className="absolute top-4 right-4 z-10">
-                        {isMuted ? 'Unmute' : 'Mute'}
-                    </button>
+        <div>
+
+            <div className='w-full leading-[0px] top-0 right-0 left-0'>
+                <Header className='absolute bg-opacity-50 z-10 w-full' />
+                <div className="relative top-0 z-0 w-full">
+
+                    {videoUrl && (
+                        <>
+                            <video ref={videoRef} autoPlay muted={isMuted} className="w-full leading-[0px]">
+                                <source src={videoUrl} type="video/mp4" />
+                                Your browser does not support the video tag.
+                            </video>
+                            <div className="absolute bottom-0 w-full h-1/2 bg-gradient-to-b from-transparent to-stone-950"></div>
+
+                            <button onClick={handleMute} className="absolute bottom-36 right-16 z-10 text-2xl rounded-full border-[2px] p-2 border-white">
+                                {isMuted ? <HiOutlineVolumeOff /> : <HiOutlineVolumeUp />}
+                            </button>
+
+                            <div className="absolute flex bottom-60 left-16 gap-4">
+                                <h1 className="text-6xl text-white font-bold font-sackers">{movie.title.toUpperCase()}</h1>
+                            </div>
+
+                            <div className="absolute flex bottom-36 left-16 gap-4">
+                                <div className="relative">
+                                    <Link to={`/movies/${movie.id}`} className="flex flex-row items-center justify-center bg-white text-black text-2xl px-8 py-3 rounded opacity-95">
+                                        <div className="px-2 w-15"><FaPlay /></div>
+                                        <div className="px-2 w-15">Play</div>
+                                    </Link>
+                                </div>
+                                <div className="relative">
+                                    <div className="flex flex-row items-center justify-center bg-gray-500 bg-opacity-50 text-white text-2xl px-8 py-3 rounded" onClick={() => handleMovieClick()}>
+                                        <div className="px-2 w-15"><LuInfo /></div>
+                                        <div className="px-2 w-15">More Info</div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </>
+                    )}
+
+                </div>
+
+
+
+
+            </div>
+            <h2 className='font-barlow text-3xl px-12'>News</h2>
+            <div className='relative px-12'>
+                <MoviesMap movies={movies} />
+            </div>
+            {clicked && (
+                <div className="">
+                    <div className="rounded shadow-md h-screen">
+                        <MovieInfo movie={movie} onClose={handleClose} />
+                    </div>
                 </div>
             )}
+
         </div>
-        </>
     );
 };
 

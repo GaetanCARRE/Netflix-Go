@@ -15,7 +15,7 @@ const MoviesMap = ({ movies }) => {
     };
 
     return (
-        <div className="flex justify-center relative mt-10">
+        <div className="flex justify-center relative">
             <div className="grid sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-10">
                 {movies.map((movie) => (
                     <div key={movie.id} className="shadow-md sm:rounded-lg">
@@ -31,7 +31,7 @@ const MoviesMap = ({ movies }) => {
                                 </Link>
                             </div>
                             <div className="flex items-center justify-center ">
-                                <TfiArrowCircleDown className="w-1/2 h-1/2 cursor-pointer" onClick={() => handleMovieClick(movie)} />
+                                <TfiArrowCircleDown className="text-2xl" onClick={() => handleMovieClick(movie)} />
                             </div>
                         </div>
                     </div>

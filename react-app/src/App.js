@@ -14,7 +14,6 @@ function App() {
   const toggleRefresh = useCallback((status) => {
     console.log("clicked")
     if (status) {
-      console.log("turning on ticking")
       let i = setInterval(() => {
         const requestOptions = {
           method: "GET",
@@ -71,14 +70,14 @@ function App() {
   return (
     <main>
       {/* Passer la prop isHomePage à Header */}
-      {location.pathname !== '/login' && !moviePathRegex.test(location.pathname) && <Header jwtToken={jwtToken} setJwtToken={setJwtToken} toggleRefresh={toggleRefresh} isHomePage={isHomePage} />}
-      <Outlet context={{
+      <Outlet 
+        context={{
         jwtToken,
         setJwtToken,
         toggleRefresh,
-
-      }}
+        }}
       />
+      {/* {location.pathname !== '/login' && !moviePathRegex.test(location.pathname) && <Header/>} */}
     </main>
   );
 }

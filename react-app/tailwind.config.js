@@ -71,6 +71,11 @@ module.exports = {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
       },
+      fontFamily: {
+        'barlow': ['Barlow', 'sans-serif'],
+        'paytone': ['Paytone One', 'sans-serif'],
+        'sackers': ['Sackers Gothic W05 Heavy', 'sans-serif']
+      }
     },
   },
   plugins: [require("tailwindcss-animate")],

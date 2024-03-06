@@ -49,7 +49,7 @@ const MovieInfo = (props) => {
                     </button>
                 </div>
 
-                <div className="flex flex-row w-full">
+                <div className="flex flex-row w-full min-h-14">
                     <div className="mx-10 w-full">
                         <h1 className="text-5xl pt-8 pb-4">{movie.title}</h1>
                         <p className="text-md text-gray-500">{release_date}</p>
