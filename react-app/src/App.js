@@ -1,16 +1,12 @@
 import React, { useCallback, useEffect } from 'react';
 import { useState } from 'react';
-import Header from './components/Header';
 import { Outlet } from 'react-router-dom';
-import { useLocation } from 'react-router-dom';
+import { HeaderProvider } from './components/HeaderContext';
 
 function App() {
-  const location = useLocation();
   const [jwtToken, setJwtToken] = useState("");
-  const [isHomePage, setIsHomePage] = useState(false); // Nouvelle state pour déterminer si on est sur la page d'accueil ou non
 
   const [tickInterval, setTickInterval] = useState();
-  const moviePathRegex = /^\/movies\/\d+$/;
   const toggleRefresh = useCallback((status) => {
     console.log("clicked")
     if (status) {
@@ -59,26 +55,24 @@ function App() {
     }
   }, [jwtToken, toggleRefresh])
 
-  useEffect(() => {
-    // Mettre à jour l'état pour indiquer si on est sur la page d'accueil ou non
-    console.log("location.pathname : ", location.pathname)
-    setIsHomePage(location.pathname === '/');
-  }, [location.pathname]);
+
 
   console.log("Rendering App"); // Ajoutez cette console pour voir combien de fois le composant App est rendu
 
   return (
-    <main>
-      {/* Passer la prop isHomePage à Header */}
-      <Outlet 
-        context={{
-        jwtToken,
-        setJwtToken,
-        toggleRefresh,
-        }}
-      />
-      {/* {location.pathname !== '/login' && !moviePathRegex.test(location.pathname) && <Header/>} */}
-    </main>
+    <HeaderProvider>
+      <main>
+        {/* Passer la prop isHomePage à Header */}
+        <Outlet
+          context={{
+            jwtToken,
+            setJwtToken,
+            toggleRefresh,
+          }}
+        />
+        {/* {location.pathname !== '/login' && !moviePathRegex.test(location.pathname) && <Header/>} */}
+      </main>
+    </HeaderProvider>
   );
 }
 

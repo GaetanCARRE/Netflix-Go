@@ -1,18 +1,25 @@
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { Dialog, Popover } from '@headlessui/react'
-import { CgMenuRightAlt, CgClose, CgNpm } from "react-icons/cg";
+import { CgMenuRightAlt, CgClose } from "react-icons/cg";
 import logo from '../assets/logo.png'
 import { Link, useNavigate } from 'react-router-dom'
 import { useOutletContext } from 'react-router-dom'
 import { IoSearch } from "react-icons/io5";
-import Search from './Search';
+import { useHeaderContext } from './HeaderContext';
 
 export default function Header(props) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const navigate = useNavigate();
   const { jwtToken, setJwtToken, toggleRefresh } = useOutletContext();
+  const { searchClick, setSearchClick, prompt, setPrompt } = useHeaderContext();
+  const promptInputRef = useRef(null);
+ 
 
-
+  useEffect(() => {
+    if (searchClick) {
+      promptInputRef.current.focus();
+    }
+  }, [searchClick]);
 
 
   const logout = () => {
@@ -31,6 +38,24 @@ export default function Header(props) {
       })
     navigate('/login');
   }
+
+  const searchMovie = (prompt) => {
+    console.log("searching for", prompt)
+    if (window.location.pathname !== '/search') {
+      navigate('/search');
+    }
+    setPrompt(prompt);
+    if (prompt === '') {
+      console.log("prompt is empty")
+      // setSearchClick(false);
+      navigate('/');
+    }
+    // check if page is already on search page
+    
+
+  }
+
+
 
 
   return (
@@ -76,8 +101,28 @@ export default function Header(props) {
             </>
           ) : null}
         </Popover.Group>
-        <div className="hidden lg:flex lg:flex-1 lg:justify-end lg:items-center">
+        <div className="hidden lg:flex lg:flex-1 lg:justify-end lg:items-center gap-5">
+          {/* search */}
+          {searchClick ? (
+            <div className='flex items-center border-2 border-gray-400 bg-transparent rounded-xl px-4 py-2'>
+              <input
+                type="text"
+                value={prompt}
+                placeholder="Enter a movie"
+                className='bg-transparent outline-none'
+                ref={promptInputRef}
+                onChange={(e) => searchMovie(e.target.value)}
+              />
+              <IoSearch className="text-white" />
+            </div>
+          ) : (
+            <IoSearch
+              className="text-white"
+              onClick={() => setSearchClick(!searchClick)}
+            />
+          )}
 
+          {/* login */}
           {jwtToken === '' ? (
             <Link to="/login" className="text-sm leading-6">
               Log in <span aria-hidden="true">&rarr;</span>
@@ -87,9 +132,7 @@ export default function Header(props) {
               Log out <span aria-hidden="true">&rarr;</span>
             </div>
           )}
-          <Link to="/search" className="text-sm leading-6">
-            <IoSearch className="text-white" />
-          </Link>
+
         </div>
       </nav>
       <Dialog as="div" className="lg:hidden" open={mobileMenuOpen} onClose={setMobileMenuOpen}>

@@ -1,9 +1,13 @@
 import React, { useState, useEffect } from 'react';
+import { useHeaderContext } from './HeaderContext';
 import MoviesMap from './MoviesMap';
+import Header from './Header';
+
 
 const Search = () => {
-    const [prompt, setPrompt] = useState('');
+    const {prompt} = useHeaderContext();
     const [movies, setMovies] = useState([]);
+
 
     useEffect(() => {
         const fetchMovies = async () => {
@@ -20,16 +24,12 @@ const Search = () => {
     }, [prompt]);
 
     return (
-        <div>
-            <input
-                type="text"
-                value={prompt}
-                onChange={(e) => setPrompt(e.target.value)}
-                placeholder="Enter a movie"
-            />
-            {movies !== null && movies.length > 0 && <MoviesMap movies={movies} />}
-            
-        </div>
+        <>
+            <Header />
+            <div className='flex bg-[#1c1c1c] w-full h-screen'>
+                    {movies !== null && movies.length > 0 && <MoviesMap movies={movies} />}
+            </div>
+        </>
     );
 };
 

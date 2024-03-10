@@ -16,7 +16,6 @@ const Home = () => {
     const videoRef = useRef(null);
     const [clicked, setClicked] = useState(false);
     const [movies, setMovies] = useState([])
-    const [genres, setGenres] = useState([])
 
     console.log(movie);
     const handleMute = () => {
@@ -83,12 +82,6 @@ const Home = () => {
             .then(data => setMovies(data))
             .catch(error => console.log(error));
 
-        fetch(`/genres`, requestOptions)
-            .then(res => res.json())
-            .then(data => setGenres(data))
-            .catch((error) => {
-                console.log(error)
-            })
     }, []);
 
     if (movie.genres) {
