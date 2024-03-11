@@ -1,18 +1,15 @@
 import React, { useCallback, useEffect } from 'react';
 import { useState } from 'react';
-import Header from './components/Header';
 import { Outlet } from 'react-router-dom';
-import { useLocation } from 'react-router-dom';
+import { HeaderProvider } from './components/HeaderContext';
+
 function App() {
-  const location = useLocation();
   const [jwtToken, setJwtToken] = useState("");
 
   const [tickInterval, setTickInterval] = useState();
-
   const toggleRefresh = useCallback((status) => {
     console.log("clicked")
     if (status) {
-      console.log("turning on ticking")
       let i = setInterval(() => {
         const requestOptions = {
           method: "GET",
@@ -25,12 +22,12 @@ function App() {
             if (data.access_token) {
               setJwtToken(data.access_token);
             }
-          }).catch((error) => {
+          }).catch(() => {
             console.log("user not logged in")
-          })
+          });
       }, 600000)
       setTickInterval(i);
-      console.log("setting tick inteveral to", i)
+      console.log("setting tick interval to", i)
     } else {
       console.log("turning off ticking")
       setTickInterval(null);
@@ -59,17 +56,23 @@ function App() {
   }, [jwtToken, toggleRefresh])
 
 
+
+  console.log("Rendering App"); // Ajoutez cette console pour voir combien de fois le composant App est rendu
+
   return (
-    <main>
-      {location.pathname !== '/login' && <Header jwtToken={jwtToken} setJwtToken={setJwtToken} toggleRefresh={toggleRefresh} />}
-      {/* <Header jwtToken={jwtToken} /> */}
-      <Outlet context={{
-        jwtToken,
-        setJwtToken,
-        toggleRefresh,
-      }}
-      />
-    </main>
+    <HeaderProvider>
+      <main>
+        {/* Passer la prop isHomePage à Header */}
+        <Outlet
+          context={{
+            jwtToken,
+            setJwtToken,
+            toggleRefresh,
+          }}
+        />
+        {/* {location.pathname !== '/login' && !moviePathRegex.test(location.pathname) && <Header/>} */}
+      </main>
+    </HeaderProvider>
   );
 }
 

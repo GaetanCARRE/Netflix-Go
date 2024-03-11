@@ -1,57 +1,66 @@
 import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
-import VideoPlayer from "./VideoPlayer";
+import { IoChevronBack } from "react-icons/io5";
 
 const Movie = () => {
     const [movie, setMovie] = useState({});
+    const [videoUrl, setVideoUrl] = useState('');
+    const handleBack = () => {
+        window.history.back();
+    }
     let { id } = useParams();
 
     useEffect(() => {
-        const headers = new Headers();
-        headers.append("Content-Type", "application/json");
-
-        const requestOptions = {
-            method: "GET",
-            headers,
+        const fetchMovie = async () => {
+            try {
+                const movieResponse = await fetch(`/movies/${id}`);
+                if (!movieResponse.ok) {
+                    throw new Error('Failed to fetch movie');
+                }
+                const movieData = await movieResponse.json();
+                setMovie(movieData);
+            } catch (error) {
+                console.error('Error fetching movie:', error);
+            }
         };
 
-        fetch(`/movies/${id}`, requestOptions)
-            .then((response) => response.json())
-            .then((data) => setMovie(data))
-            .catch((error) => console.log(error));
+        const fetchVideo = async () => {
+            try {
+                const videoResponse = await fetch(`/videos/${id}.mp4`);
+                if (!videoResponse.ok) {
+                    throw new Error('Failed to fetch video');
+                }
+                // Since we're fetching the video directly, set the video URL directly
+                setVideoUrl(`/videos/${id}.mp4`);
+            } catch (error) {
+                console.error('Error fetching video:', error);
+            }
+        };
+
+        fetchMovie();
+        fetchVideo();
     }, [id]);
-    console.log(movie);
 
     if (movie.genres) {
         movie.genres = Object.values(movie.genres);
-
     } else {
         movie.genres = [];
     }
 
     return (
-        <div className="mt-10 mx-24">
-            <h1 className="text-3xl">{movie.title}</h1>
-            <p className="text-sm text-gray-500">{movie.release_date}</p>
-            <p className="text-sm text-gray-500">{movie.runtime} min</p>
-            <div className="py-8">
-                {movie.genres.map((g) => (
-                    <span className="bg-gray-100 text-gray-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded dark:bg-gray-700 dark:text-gray-400 border border-gray-500" key={g.genre}>{g.genre}</span>
-                )
+        <>
+            <div className="w-full h-full">
+                {videoUrl && (
+                    <video controls autoPlay className="h-screen w-full">
+                        <source src={videoUrl} type="video/mp4" />
+                        Your browser does not support the video tag.
+                    </video>
                 )}
             </div>
-            {movie.image !== "" &&
-                <div className="mb-3">
-                    <img src={movie.image} alt={movie.title} width={200} />
-                </div>
-            }
-            <div>
-                <VideoPlayer
-                    path={movie.video_path}
-                />
+            <div className="text-4xl absolute top-5 left-5">
+                <IoChevronBack onClick={handleBack}/>
             </div>
-            <p> Description : {movie.description}</p>
-        </div>
+        </>
     );
 }
 

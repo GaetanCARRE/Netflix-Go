@@ -167,6 +167,32 @@ func (app *application) GetMovie(w http.ResponseWriter, r *http.Request) {
 	_ = app.writeJSON(w, http.StatusOK, movie)
 
 }
+
+func (app *application) GetRandomMovie(w http.ResponseWriter, r *http.Request) {
+	movie, err := app.DB.RandomMovie()
+	if err != nil {
+		app.errorJSON(w, err)
+		return
+	}
+
+	_ = app.writeJSON(w, http.StatusOK, movie)
+}
+
+func (app *application) GetLatestMovies(w http.ResponseWriter, r *http.Request) {
+	movie_count := r.URL.Query().Get("count")
+	count, err := strconv.Atoi(movie_count)
+	if err != nil {
+		count = 10
+	}
+	movies, err := app.DB.LatestMovies(count)
+	if err != nil {
+		app.errorJSON(w, err)
+		return
+	}
+
+	_ = app.writeJSON(w, http.StatusOK, movies)
+}
+
 func (app *application) MovieForEdit(w http.ResponseWriter, r *http.Request) {
 	id := chi.URLParam(r, "id")
 	movieID, err := strconv.Atoi(id)
@@ -240,7 +266,8 @@ func (app *application) getPoster(movie models.Movie) models.Movie {
 	type TheMovieDB struct {
 		Page    int `json:"page"`
 		Results []struct {
-			PosterPath string `json:"poster_path"`
+			PosterPath   string `json:"poster_path"`
+			BackdropPath string `json:"backdrop_path"`
 		} `json:"results"`
 		TotalPages int `json:"total_pages"`
 	}
@@ -274,6 +301,7 @@ func (app *application) getPoster(movie models.Movie) models.Movie {
 
 	if len(responseObject.Results) > 0 {
 		movie.Image = responseObject.Results[0].PosterPath
+		movie.Backdrop = responseObject.Results[0].BackdropPath
 	}
 
 	return movie
@@ -298,6 +326,7 @@ func (app *application) UpdateMovie(w http.ResponseWriter, r *http.Request) {
 	movie.Image = payload.Image
 	movie.RunTime = payload.RunTime
 	movie.UpdatedAt = time.Now()
+	movie.Type = payload.Type
 
 	err = app.DB.UpdateMovie(*movie)
 	if err != nil {
@@ -348,6 +377,22 @@ func (app *application) AllMoviesByGenre(w http.ResponseWriter, r *http.Request)
 	}
 
 	movies, err := app.DB.AllMovies(id)
+	if err != nil {
+		app.errorJSON(w, err)
+		return
+	}
+
+	app.writeJSON(w, http.StatusOK, movies)
+}
+
+func (app *application) SearchMovies(w http.ResponseWriter, r *http.Request) {
+	query := r.URL.Query().Get("q")
+	if query == "" {
+		app.errorJSON(w, errors.New("missing search query"), http.StatusBadRequest)
+		return
+	}
+
+	movies, err := app.DB.SearchMovies(query)
 	if err != nil {
 		app.errorJSON(w, err)
 		return

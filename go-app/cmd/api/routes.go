@@ -3,6 +3,8 @@ package main
 import (
 	"net/http"
 
+	"fmt"
+
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 )
@@ -25,6 +27,9 @@ func (app *application) routes() http.Handler {
 
 	mux.Get("/genres", app.AllGenres)
 	mux.Get("/movies/genres/{id}", app.AllMoviesByGenre)
+	mux.Get("/random", app.GetRandomMovie)
+	mux.Get("/latest", app.GetLatestMovies)
+	mux.Get("/search", app.SearchMovies)
 
 	mux.Route("/admin", func(mux chi.Router) {
 		mux.Use(app.authRequired)
@@ -33,6 +38,10 @@ func (app *application) routes() http.Handler {
 		mux.Put("/movies/0", app.InsertMovie)
 		mux.Patch("/movies/{id}", app.UpdateMovie)
 		mux.Delete("/movies/{id}", app.DeleteMovie)
+	})
+	mux.Get("/videos/{name}", func(w http.ResponseWriter, r *http.Request) {
+		name := chi.URLParam(r, "name")
+		http.ServeFile(w, r, fmt.Sprintf("videos/%s", name))
 	})
 
 	return mux

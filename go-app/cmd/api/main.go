@@ -13,15 +13,16 @@ import (
 const port = 8080
 
 type application struct {
-	DSN          string
-	Domain       string
-	DB           repository.DatabaseRepo
-	auth         Auth
-	JWTSecret    string
-	JWTIssuer    string
-	JWTAudience  string
-	CookieDomain string
-	APIKey       string
+	DSN              string
+	Domain           string
+	DB               repository.DatabaseRepo
+	auth             Auth
+	JWTSecret        string
+	JWTIssuer        string
+	JWTAudience      string
+	CookieDomain     string
+	APIKey           string
+	VideoStoragePath string
 }
 
 func main() {
@@ -29,13 +30,14 @@ func main() {
 	var app application
 
 	// read from command line
-	flag.StringVar(&app.DSN, "dsn", "host=localhost port=5432 user=postgres password=postgres dbname=movies sslmode=disable timezone=UTC connect_timeout=5", "Postgres connection string")
+	flag.StringVar(&app.DSN, "dsn", "host=host.docker.internal port=5432 user=postgres password=postgres dbname=movies sslmode=disable timezone=UTC connect_timeout=5", "Postgres connection string")
 	flag.StringVar(&app.JWTSecret, "jwt-secret", "verysecret", "signing secret")
 	flag.StringVar(&app.JWTIssuer, "jwt-issuer", "example.com", "signing issuer")
 	flag.StringVar(&app.JWTAudience, "jwt-audience", "example.com", "signing audience")
-	flag.StringVar(&app.CookieDomain, "cookie-domain", "localhost", "cookie domain")
+	flag.StringVar(&app.CookieDomain, "cookie-domain", "host.docker.internal", "cookie domain")
 	flag.StringVar(&app.Domain, "domain", "example.com", "domain")
 	flag.StringVar(&app.APIKey, "api-key", "74925a575641b207c968b1444138ef84", "api key")
+	flag.StringVar(&app.VideoStoragePath, "video-storage-path", "../../videos", "path to video storage")
 	flag.Parse()
 
 	// connect to the database
