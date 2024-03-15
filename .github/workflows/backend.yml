@@ -44,4 +44,4 @@ jobs:
       with:
         context: ./go-app
         push: true
-        tags: GaetanCARRE/goflix_v0.0.1:latest
+        tags: gaetancarre/goflix_v0.0.1:latest
