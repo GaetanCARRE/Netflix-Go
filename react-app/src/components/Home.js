@@ -47,7 +47,7 @@ const Home = () => {
         }
     };
 
-    const fetchVideo = async () => {
+    const fetchVideo = useCallback(async () => {
         try {
             const videoResponse = await fetch(`/videos/${movie.id}.mp4`);
             if (!videoResponse.ok) {
@@ -58,7 +58,7 @@ const Home = () => {
         } catch (error) {
             console.error('Error fetching video:', error);
         }
-    };
+    }, [movie.id]); // Add any dependencies here
 
     useEffect(() => {
         fetchMovie();
