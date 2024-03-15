@@ -7,6 +7,7 @@ import { Link } from 'react-router-dom';
 import { LuInfo } from "react-icons/lu";
 import MovieInfo from './MovieInfo';
 import MoviesMap from './MoviesMap';
+import { useCallback } from 'react';
 
 
 const Home = () => {
