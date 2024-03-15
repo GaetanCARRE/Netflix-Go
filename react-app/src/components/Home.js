@@ -68,7 +68,7 @@ const Home = () => {
         if (movie.id) {
             fetchVideo();
         }
-    }, [movie.id]);
+    }, [movie.id, fetchMovie]);
 
     useEffect(() => {
         const headers = new Headers();
