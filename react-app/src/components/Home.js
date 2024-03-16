@@ -37,7 +37,7 @@ const Home = () => {
 
     const fetchMovie = async () => {
         try {
-            const movieResponse = await fetch(`/random`);
+            const movieResponse = await fetch(`${process.env.REACT_APP_BACKEND}/random`);
             if (!movieResponse.ok) {
                 throw new Error('Failed to fetch movie');
             }
@@ -50,12 +50,12 @@ const Home = () => {
 
     const fetchVideo = useCallback(async () => {
         try {
-            const videoResponse = await fetch(`/videos/${movie.id}.mp4`);
+            const videoResponse = await fetch(`${process.env.REACT_APP_BACKEND}/videos/${movie.id}.mp4`);
             if (!videoResponse.ok) {
                 throw new Error('Failed to fetch video');
             }
             // Since we're fetching the video directly, set the video URL directly
-            setVideoUrl(`/videos/${movie.id}.mp4`);
+            setVideoUrl(`${process.env.REACT_APP_BACKEND}/videos/${movie.id}.mp4`);
         } catch (error) {
             console.error('Error fetching video:', error);
         }
@@ -78,7 +78,7 @@ const Home = () => {
             method: 'GET',
             headers: headers,
         };
-        fetch(`/latest?count=6`, requestOptions)
+        fetch(`${process.env.REACT_APP_BACKEND}/latest?count=6`, requestOptions)
             .then(response => response.json())
             .then(data => setMovies(data))
             .catch(error => console.log(error));

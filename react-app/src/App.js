@@ -15,7 +15,7 @@ function App() {
           method: "GET",
           credentials: "include",
         }
-        fetch(`/refresh`, requestOptions)
+        fetch(`${process.env.REACT_APP_BACKEND}/refresh`, requestOptions)
           .then(response => response.json())
           .then((data) => {
             console.log(data)
@@ -41,7 +41,7 @@ function App() {
         method: "GET",
         credentials: "include",
       }
-      fetch(`/refresh`, requestOptions)
+      fetch(`${process.env.REACT_APP_BACKEND}/refresh`, requestOptions)
         .then(response => response.json())
         .then((data) => {
           console.log(data)

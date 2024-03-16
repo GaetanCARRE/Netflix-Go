@@ -12,7 +12,7 @@ const Search = () => {
     useEffect(() => {
         const fetchMovies = async () => {
             try {
-                const response = await fetch(`/search?q=${prompt}`);
+                const response = await fetch(`${process.env.REACT_APP_BACKEND}/search?q=${prompt}`);
                 const data = await response.json();
                 setMovies(data);
             } catch (error) {
