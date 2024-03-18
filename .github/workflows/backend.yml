@@ -4,7 +4,7 @@ on:
     branches: [ feature/actions ]
 
 jobs:
-  build:
+  build_and_push:
     runs-on: ubuntu-latest
     services:
       postgres:
@@ -45,3 +45,18 @@ jobs:
         context: ./go-app
         push: true
         tags: gaetancarre/goflix_backend_v0.0.1:latest
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build_and_push
+    steps:
+    - name: Deploy to DigitalOcean
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ secrets.DIGITAL_OCEAN_HOST }}
+        username: ${{ secrets.DIGITAL_OCEAN_USERNAME }}
+        key: ${{ secrets.DIGITAL_OCEAN_PRIVATE_KEY }}
+        script: |
+          docker pull gaetancarre/goflix_backend_v0.0.1:latest
+          docker stop goflix_backend || true
+          docker rm goflix_backend || true
+          docker run -d -p 8080:8080 --name goflix_backend gaetancarre/goflix_backend_v0.0.1:latest
