@@ -1,7 +1,8 @@
 name: Backend Test
 on:
   push:
-    branches: [ feature/actions ]
+    branches: 
+      - feature/actions
 
 jobs:
   build_and_push:
