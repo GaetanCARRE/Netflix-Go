@@ -50,11 +50,12 @@ jobs:
     needs: build_and_push
     steps:
     - name: Deploy to DigitalOcean
-      uses: appleboy/ssh-action@master
+      uses: appleboy/ssh-action@v0.1.3
       with:
-        host: ${{ secrets.DIGITAL_OCEAN_HOST }}
-        username: ${{ secrets.DIGITAL_OCEAN_USERNAME }}
-        key: ${{ secrets.DIGITAL_OCEAN_PRIVATE_KEY }}
+        host: ${{ secrets.HOST }}
+        username: ${{ secrets.USERNAME }}
+        key: ${{ secrets.SSHKEY }}
+        passphrase: ${{ secrets.PASSPHRASE }}
         script: |
           docker pull gaetancarre/goflix_backend_v0.0.1:latest
           docker stop goflix_backend || true
