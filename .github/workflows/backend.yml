@@ -1,5 +1,4 @@
-name: Backend Test
-
+name: Go Backend CI
 on:
   push:
     branches: 
