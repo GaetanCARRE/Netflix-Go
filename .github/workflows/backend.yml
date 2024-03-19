@@ -1,4 +1,6 @@
 name: Go Backend CI
+
+
 on:
   push:
     branches: 
@@ -51,7 +53,7 @@ jobs:
     needs: build_and_push
     steps:
     - name: Deploy to DigitalOcean
-      uses: appleboy/ssh-action@master
+      uses: appleboy/ssh-action@v0.1.3
       with:
         host: ${{ secrets.HOST }}
         username: ${{ secrets.USERNAME }}

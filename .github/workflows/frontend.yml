@@ -1,4 +1,6 @@
 name: React Frontend CI
+
+
 on:
   push:
     branches:
@@ -25,30 +27,24 @@ jobs:
         with:
           username: ${{ secrets.DOCKER_HUB_USERNAME }}
           password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
-
+  
       - name: Build and push Docker image
         uses: docker/build-push-action@v2
         with:
           context: ./react-app
           push: true
           tags: gaetancarre/goflix_frontend_v0.0.1:latest
-
   deploy:
     runs-on: ubuntu-latest
     needs: build_and_push
     steps:
       - name: Deploy to DigitalOcean
-        uses: appleboy/ssh-action@master
+        uses: appleboy/ssh-action@v0.1.3
         with:
           host: ${{ secrets.HOST }}
           username: ${{ secrets.USERNAME }}
           key: ${{ secrets.SSHKEY }}
           script: |
-            echo "Host: ${{ secrets.HOST }}"
-            echo "Username: ${{ secrets.USERNAME }}"
-            echo "Docker Hub Username: ${{ secrets.DOCKER_HUB_USERNAME }}"
-            echo "Docker Hub Access Token: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}"
-            echo "SSH Key: ${{ secrets.SSHKEY }}"
             docker login -u ${{ secrets.DOCKER_HUB_USERNAME }} -p ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
             docker pull gaetancarre/goflix_frontend_v0.0.1:latest
             docker run -d -p 80:80 gaetancarre/goflix_frontend_v0.0.1:latest
