@@ -1,5 +1,6 @@
 name: React Frontend CI
 
+
 on:
   push:
     branches:
