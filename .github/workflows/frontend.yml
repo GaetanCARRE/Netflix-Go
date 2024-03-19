@@ -1,4 +1,4 @@
-name: React Frontend CI/CD
+name: React Frontend CI
 
 on:
   push:
