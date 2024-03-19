@@ -1,5 +1,4 @@
 name: Go Backend CI
-
 on:
   push:
     branches: 
@@ -58,6 +57,7 @@ jobs:
         username: ${{ secrets.USERNAME }}
         key: ${{ secrets.SSHKEY }}
         passphrase: ${{ secrets.PASSPHRASE }}
+        port: 22
         script: |
           docker pull gaetancarre/goflix_backend_v0.0.1:latest
           docker stop goflix_backend || true
