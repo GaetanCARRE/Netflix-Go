@@ -1,6 +1,4 @@
 name: Go Backend CI
-
-
 on:
   push:
     branches: 
