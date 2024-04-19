@@ -16,12 +16,12 @@ const Movies = () => {
             method: 'GET',
             headers: headers,
         };
-        fetch(`/movies`, requestOptions)
+        fetch(`${process.env.REACT_APP_BACKEND}/movies`, requestOptions)
             .then(response => response.json())
             .then(data => setMovies(data))
             .catch(error => console.log(error));
 
-        fetch(`/genres`, requestOptions)
+        fetch(`${process.env.REACT_APP_BACKEND}/genres`, requestOptions)
             .then(res => res.json())
             .then(data => setGenres(data))
             .catch((error) => {

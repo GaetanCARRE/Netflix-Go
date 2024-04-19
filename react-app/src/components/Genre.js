@@ -21,7 +21,7 @@ const Genre = () => {
             method: 'GET',
             headers: headers,
         }
-        fetch(`/movies/genres/${id}`, requestOptions)
+        fetch(`${process.env.REACT_APP_BACKEND}/movies/genres/${id}`, requestOptions)
             .then(res => res.json())
             .then(data => {
                 console.log("data", data)
