@@ -47,4 +47,4 @@ jobs:
           script: |
             docker login -u ${{ secrets.DOCKER_HUB_USERNAME }} -p ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
             docker pull gaetancarre/goflix_frontend_v0.0.1:latest
-            docker run -d -p 80:80 gaetancarre/goflix_frontend_v0.0.1:latest
+            docker run -d -p 3000:3000 gaetancarre/goflix_frontend_v0.0.1:latest
