@@ -6,6 +6,26 @@ A Netflix-like streaming platform clone built with **Go** (backend) and **React*
 
 ---
 
+## Screenshots
+
+<img src="screenshots/home.png" alt="Home Page" width="100%">
+
+*Home Page*
+
+<img src="screenshots/movie_modal.png" alt="Movie Info Modal" width="100%">
+
+*Movie Info Modal*
+
+<img src="screenshots/admin.png" alt="Admin Panel - Catalog" width="100%">
+
+*Admin Panel - Catalog*
+
+<img src="screenshots/movies.png" alt="Movies Listing" width="100%">
+
+*Movies Listing*
+
+---
+
 ## Table of Contents
 
 - [Overview](#overview)
@@ -467,18 +487,6 @@ netflix-go/
     ├── package.json
     └── tailwind.config.js
 ```
-
----
-
-## Screenshots
-
-| Home Page | Movie Info Modal |
-|-----------|------------------|
-| ![Home](screenshots/home.png) | ![Movie Modal](screenshots/movie_modal.png) |
-
-| Admin Panel - Catalog | Movies Listing |
-|------------------------|----------------|
-| ![Admin](screenshots/admin.png) | ![Movies](screenshots/movies.png) |
 
 ---
 
