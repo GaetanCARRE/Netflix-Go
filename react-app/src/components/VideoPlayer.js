@@ -7,10 +7,11 @@ const VideoPlayer = (props) => {
         <div className='player-wrapper'>
             <ReactPlayer
             className='react-player fixed-bottom'
-            url={"/" + props.path}
+            url={props.path.startsWith('http') ? props.path : "/" + props.path}
             width='100%'
-            height='100%'
+            height='100vh'
             controls={true}
+            playing={true}
             />
         </div>
     );

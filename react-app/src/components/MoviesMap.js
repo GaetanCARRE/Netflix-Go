@@ -20,7 +20,11 @@ const MoviesMap = ({ movies }) => {
                 {movies.map((movie) => (
                     <div key={movie.id} className="shadow-md sm:rounded-lg">
                         <Link to={`/movies/${movie.id}`} >
-                            <img src={`https://image.tmdb.org/t/p/w400/${movie.image}`} alt={movie.title} width={300} />
+                            <img 
+                                src={`https://image.tmdb.org/t/p/w400/${(movie.image || '').replace(/^\/+/, '')}`} 
+                                alt={movie.title} 
+                                className="w-full h-auto object-cover aspect-[2/3]"
+                            />
                         </Link>
 
                         <div className="pt-2 grid grid-cols-4">

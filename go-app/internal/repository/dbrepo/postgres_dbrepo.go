@@ -554,6 +554,89 @@ func (m *PostgresDBRepo) LatestMovies(count int) ([]*models.Movie, error) {
 
 }
 
+func (m *PostgresDBRepo) GetUserList(userID int) ([]*models.Movie, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), dbTimeout)
+	defer cancel()
+
+	query := `
+		select m.id, m.title, m.release_date, m.runtime, m.description, 
+			coalesce(m.image, ''), coalesce(m.backdrop, ''), m.created_at, m.updated_at
+		from movies m
+		join user_movie_list u on m.id = u.movie_id
+		where u.user_id = $1
+		order by u.created_at desc
+	`
+
+	rows, err := m.DB.QueryContext(ctx, query, userID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var movies []*models.Movie
+	for rows.Next() {
+		var movie models.Movie
+		err := rows.Scan(
+			&movie.ID,
+			&movie.Title,
+			&movie.ReleaseDate,
+			&movie.RunTime,
+			&movie.Description,
+			&movie.Image,
+			&movie.Backdrop,
+			&movie.CreatedAt,
+			&movie.UpdatedAt,
+		)
+		if err != nil {
+			return nil, err
+		}
+
+		genresQuery := `select g.id, g.genre from movies_genres mg
+			left join genres g on (mg.genre_id = g.id)
+			where mg.movie_id = $1 order by g.genre`
+
+		genreRows, err := m.DB.QueryContext(ctx, genresQuery, movie.ID)
+		if err != nil && err != sql.ErrNoRows {
+			return nil, err
+		}
+		defer genreRows.Close()
+
+		var genres []*models.Genre
+		for genreRows.Next() {
+			var g models.Genre
+			err := genreRows.Scan(&g.ID, &g.Genre)
+			if err != nil {
+				return nil, err
+			}
+			genres = append(genres, &g)
+		}
+		movie.Genres = genres
+
+		movies = append(movies, &movie)
+	}
+
+	return movies, nil
+}
+
+func (m *PostgresDBRepo) AddToList(userID int, movieID int) error {
+	ctx, cancel := context.WithTimeout(context.Background(), dbTimeout)
+	defer cancel()
+
+	_, err := m.DB.ExecContext(ctx,
+		`INSERT INTO user_movie_list (user_id, movie_id) VALUES ($1, $2) 
+		 ON CONFLICT (user_id, movie_id) DO NOTHING`, userID, movieID)
+	return err
+}
+
+func (m *PostgresDBRepo) RemoveFromList(userID int, movieID int) error {
+	ctx, cancel := context.WithTimeout(context.Background(), dbTimeout)
+	defer cancel()
+
+	_, err := m.DB.ExecContext(ctx,
+		`DELETE FROM user_movie_list WHERE user_id = $1 AND movie_id = $2`, userID, movieID)
+	return err
+}
+
 func (m *PostgresDBRepo) SearchMovies(search string) ([]*models.Movie, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), dbTimeout)
 	defer cancel()

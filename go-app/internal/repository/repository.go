@@ -20,4 +20,7 @@ type DatabaseRepo interface {
 	DeleteMovie(id int) error
 	LatestMovies(count int) ([]*models.Movie, error)
 	SearchMovies(search string) ([]*models.Movie, error)
+	GetUserList(userID int) ([]*models.Movie, error)
+	AddToList(userID int, movieID int) error
+	RemoveFromList(userID int, movieID int) error
 }

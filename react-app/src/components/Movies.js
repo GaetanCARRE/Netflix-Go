@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useOutletContext } from "react-router-dom";
 import MoviesMap from "./MoviesMap";
 import { IoChevronDown, IoChevronUp } from "react-icons/io5";
 import { Link } from "react-router-dom";
@@ -8,17 +9,24 @@ const Movies = () => {
     const [movies, setMovies] = useState([])
     const [genres, setGenres] = useState([])
     const [showGenres, setShowGenres] = useState(false)
+    const { jwtToken } = useOutletContext();
 
     useEffect(() => {
         const headers = new Headers();
         headers.append('Content-Type', 'application/json');
+        if (jwtToken) {
+            headers.append('Authorization', `Bearer ${jwtToken}`);
+        }
         const requestOptions = {
             method: 'GET',
             headers: headers,
         };
         fetch(`/movies`, requestOptions)
             .then(response => response.json())
-            .then(data => setMovies(data))
+            .then(data => {
+                const filtered = data.filter(m => !m.type || m.type !== 'series');
+                setMovies(filtered);
+            })
             .catch(error => console.log(error));
 
         fetch(`/genres`, requestOptions)
@@ -27,53 +35,45 @@ const Movies = () => {
             .catch((error) => {
                 console.log(error)
             })
-    }, []);
-    console.log(movies);
-
-
+    }, [jwtToken]);
 
     return (
         <>
             <Header />
 
             <div className="py-6 px-12">
-                {/* <h1 className="text-4xl px-12">Movies</h1> */}
-                <div
-                    className="flex items-center border solid mt-5 text-2xl gap-6 w-min rounded p-2"
-                    onClick={() => setShowGenres(!showGenres)}
-                >
-                    <div>Genres</div>
-                    <div>
+                <div className="relative">
+                    <button
+                        className="flex items-center gap-2 border border-gray-600 rounded-full px-5 py-2 text-gray-300 hover:bg-gray-800 transition"
+                        onClick={() => setShowGenres(!showGenres)}
+                    >
+                        <span className="text-sm font-medium">Genres</span>
                         {showGenres ? <IoChevronUp /> : <IoChevronDown />}
-
-                    </div>
-
-                </div>
-                {showGenres && (
-                    <div className="absolute grid grid-cols-4 border border-gray-600 rounded p-2 w-1/3 bg-black bg-opacity-90 z-10">
-                        {genres.map((g) => (
-                            <Link
-                                key={g.id}
-                                to={`/genre/${g.id}`}
-                                state={
-                                    {
+                    </button>
+                    
+                    {showGenres && (
+                        <div className="absolute top-full mt-2 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2 bg-stone-900 border border-gray-700 rounded-xl p-4 z-20 min-w-[300px] shadow-xl">
+                            {genres.map((g) => (
+                                <Link
+                                    key={g.id}
+                                    to={`/genre/${g.id}`}
+                                    state={{
                                         genreName: g.genre,
                                         genres: genres
-                                    }
-                                }
-                            >
-                                {g.genre}
-                            </Link>
-                        ))}
-                    </div>
-                )}
+                                    }}
+                                    className="px-3 py-2 text-sm text-gray-300 hover:bg-red-600 hover:text-white rounded-lg transition text-center"
+                                >
+                                    {g.genre}
+                                </Link>
+                            ))}
+                        </div>
+                    )}
+                </div>
+                
                 <MoviesMap movies={movies} />
-
             </div>
         </>
     );
-
 }
 
 export default Movies;
-

@@ -400,3 +400,55 @@ func (app *application) SearchMovies(w http.ResponseWriter, r *http.Request) {
 
 	app.writeJSON(w, http.StatusOK, movies)
 }
+
+func (app *application) GetUserList(w http.ResponseWriter, r *http.Request) {
+	userID := r.Context().Value("userID").(int)
+
+	movies, err := app.DB.GetUserList(userID)
+	if err != nil {
+		app.errorJSON(w, err)
+		return
+	}
+
+	app.writeJSON(w, http.StatusOK, movies)
+}
+
+func (app *application) AddToList(w http.ResponseWriter, r *http.Request) {
+	var requestPayload struct {
+		MovieID int `json:"movie_id"`
+	}
+
+	err := app.readJSON(w, r, &requestPayload)
+	if err != nil {
+		app.errorJSON(w, err, http.StatusBadRequest)
+		return
+	}
+
+	userID := r.Context().Value("userID").(int)
+
+	err = app.DB.AddToList(userID, requestPayload.MovieID)
+	if err != nil {
+		app.errorJSON(w, err)
+		return
+	}
+
+	app.writeJSON(w, http.StatusOK, JSONResponse{Error: false, Message: "Added to list"})
+}
+
+func (app *application) RemoveFromList(w http.ResponseWriter, r *http.Request) {
+	movieID, err := strconv.Atoi(chi.URLParam(r, "movie_id"))
+	if err != nil {
+		app.errorJSON(w, errors.New("invalid movie id"), http.StatusBadRequest)
+		return
+	}
+
+	userID := r.Context().Value("userID").(int)
+
+	err = app.DB.RemoveFromList(userID, movieID)
+	if err != nil {
+		app.errorJSON(w, err)
+		return
+	}
+
+	app.writeJSON(w, http.StatusOK, JSONResponse{Error: false, Message: "Removed from list"})
+}

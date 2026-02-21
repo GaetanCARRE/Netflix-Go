@@ -31,6 +31,13 @@ func (app *application) routes() http.Handler {
 	mux.Get("/latest", app.GetLatestMovies)
 	mux.Get("/search", app.SearchMovies)
 
+	mux.Route("/user-list", func(mux chi.Router) {
+		mux.Use(app.authRequired)
+		mux.Get("/", app.GetUserList)
+		mux.Post("/", app.AddToList)
+		mux.Delete("/{movie_id}", app.RemoveFromList)
+	})
+
 	mux.Route("/admin", func(mux chi.Router) {
 		mux.Use(app.authRequired)
 		mux.Get("/movies", app.MovieCatalog)

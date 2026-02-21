@@ -1,10 +1,10 @@
 import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { IoChevronBack } from "react-icons/io5";
+import VideoPlayer from "./VideoPlayer";
 
 const Movie = () => {
     const [movie, setMovie] = useState({});
-    const [videoUrl, setVideoUrl] = useState('');
     const handleBack = () => {
         window.history.back();
     }
@@ -24,43 +24,24 @@ const Movie = () => {
             }
         };
 
-        const fetchVideo = async () => {
-            try {
-                const videoResponse = await fetch(`/videos/${id}.mp4`);
-                if (!videoResponse.ok) {
-                    throw new Error('Failed to fetch video');
-                }
-                // Since we're fetching the video directly, set the video URL directly
-                setVideoUrl(`/videos/${id}.mp4`);
-            } catch (error) {
-                console.error('Error fetching video:', error);
-            }
-        };
-
         fetchMovie();
-        fetchVideo();
     }, [id]);
 
-    if (movie.genres) {
-        movie.genres = Object.values(movie.genres);
-    } else {
-        movie.genres = [];
-    }
-
     return (
-        <>
+        <div className="bg-black h-screen w-full relative">
             <div className="w-full h-full">
-                {videoUrl && (
-                    <video controls autoPlay className="h-screen w-full">
-                        <source src={videoUrl} type="video/mp4" />
-                        Your browser does not support the video tag.
-                    </video>
+                {movie.video_path ? (
+                    <VideoPlayer path={movie.video_path} />
+                ) : (
+                    <div className="flex items-center justify-center h-full text-white text-2xl">
+                        Bande-annonce non disponible
+                    </div>
                 )}
             </div>
-            <div className="text-4xl absolute top-5 left-5">
+            <div className="text-4xl absolute top-5 left-5 z-50 text-white cursor-pointer hover:scale-110 transition">
                 <IoChevronBack onClick={handleBack}/>
             </div>
-        </>
+        </div>
     );
 }
 
