@@ -2,7 +2,7 @@
 
 A Netflix-like streaming platform clone built with **Go** (backend) and **React** (frontend). This project demonstrates a complete full-stack application with user authentication, video streaming, content management, and admin capabilities.
 
-![Demo](screenshots/demo.gif)
+<img src="screenshots/demo.gif" alt="Demo" width="100%">
 
 ---
 
