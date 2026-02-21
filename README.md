@@ -488,19 +488,6 @@ netflix-go/
     └── tailwind.config.js
 ```
 
----
-
-## Default Credentials
-
-The database is seeded with a default admin user:
-
-| Email | Password | Role |
-|-------|----------|------|
-| `admin@example.com` | `password` | Admin |
-
-> **Warning**: Change these credentials before deploying to production.
-
----
 
 ## Getting a TMDB API Key
 
