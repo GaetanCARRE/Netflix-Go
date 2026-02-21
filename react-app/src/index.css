@@ -5,6 +5,6 @@
 body {
   @apply bg-stone-950;
   height: 100vh;
-  color: white
-  
+  color: white;
+  font-family: 'Barlow', sans-serif;
 }

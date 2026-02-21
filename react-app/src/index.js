@@ -14,6 +14,9 @@ import EditMovie from './components/EditMovie';
 import ManageCatalog from './components/ManageCatalog';
 import Login from './components/Login';
 import Movie from './components/Movie';
+import Genres from './components/Genres';
+import Genre from './components/Genre';
+import Search from './components/Search';
 
 const router = createBrowserRouter([
   {
@@ -54,7 +57,23 @@ const router = createBrowserRouter([
         element: <Series />
       },
       {
+        path: '/search',
+        element: <Search />
+      },
+      {
+        path: '/genres',
+        element: <Genres />
+      },
+      {
+        path: '/genre/:id',
+        element: <Genre />
+      },
+      {
         path: '/admin/movie/0',
+        element: <EditMovie />
+      },
+      {
+        path: '/admin/movie/:id',
         element: <EditMovie />
       },
       {
@@ -69,11 +88,12 @@ const router = createBrowserRouter([
   }
 ]
 );
+
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
-  <React.StrictMode>
-    <RouterProvider router={router} />
-  </React.StrictMode>
+  // <React.StrictMode>
+  <RouterProvider router={router} />
+  // </React.StrictMode>
 );
 
 
