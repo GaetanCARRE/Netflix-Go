@@ -47,4 +47,5 @@ Thumbs.db
 postgres-data/
 
 # Project specific
-go-app/videos/
+go-app/videos/*
+!go-app/videos/.gitkeep
