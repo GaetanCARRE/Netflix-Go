@@ -452,3 +452,79 @@ func (app *application) RemoveFromList(w http.ResponseWriter, r *http.Request) {
 
 	app.writeJSON(w, http.StatusOK, JSONResponse{Error: false, Message: "Removed from list"})
 }
+
+func (app *application) GetProgress(w http.ResponseWriter, r *http.Request) {
+	movieID, err := strconv.Atoi(chi.URLParam(r, "movie_id"))
+	if err != nil {
+		app.errorJSON(w, errors.New("invalid movie id"), http.StatusBadRequest)
+		return
+	}
+
+	userID := r.Context().Value("userID").(int)
+
+	progress, total, err := app.DB.GetProgress(userID, movieID)
+	if err != nil {
+		app.errorJSON(w, err)
+		return
+	}
+
+	app.writeJSON(w, http.StatusOK, map[string]int{
+		"progress_seconds": progress,
+		"total_seconds":    total,
+	})
+}
+
+func (app *application) SaveProgress(w http.ResponseWriter, r *http.Request) {
+	movieID, err := strconv.Atoi(chi.URLParam(r, "movie_id"))
+	if err != nil {
+		app.errorJSON(w, errors.New("invalid movie id"), http.StatusBadRequest)
+		return
+	}
+
+	var requestPayload struct {
+		ProgressSeconds int `json:"progress_seconds"`
+		TotalSeconds    int `json:"total_seconds"`
+	}
+
+	err = app.readJSON(w, r, &requestPayload)
+	if err != nil {
+		app.errorJSON(w, err, http.StatusBadRequest)
+		return
+	}
+
+	userID := r.Context().Value("userID").(int)
+
+	err = app.DB.SaveProgress(userID, movieID, requestPayload.ProgressSeconds, requestPayload.TotalSeconds)
+	if err != nil {
+		app.errorJSON(w, err)
+		return
+	}
+
+	app.writeJSON(w, http.StatusOK, JSONResponse{Error: false, Message: "Progress saved"})
+}
+
+func (app *application) GetCurrentUser(w http.ResponseWriter, r *http.Request) {
+	userID := r.Context().Value("userID").(int)
+
+	user, err := app.DB.GetUserByID(userID)
+	if err != nil {
+		app.errorJSON(w, err)
+		return
+	}
+
+	response := struct {
+		ID        int    `json:"id"`
+		FirstName string `json:"first_name"`
+		LastName  string `json:"last_name"`
+		Email     string `json:"email"`
+		IsAdmin   bool   `json:"is_admin"`
+	}{
+		ID:        user.ID,
+		FirstName: user.FirstName,
+		LastName:  user.LastName,
+		Email:     user.Email,
+		IsAdmin:   user.IsAdmin,
+	}
+
+	app.writeJSON(w, http.StatusOK, response)
+}

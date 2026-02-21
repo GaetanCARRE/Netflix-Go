@@ -1,13 +1,16 @@
 import { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useOutletContext } from "react-router-dom";
 import { IoChevronBack } from "react-icons/io5";
 import VideoPlayer from "./VideoPlayer";
 
 const Movie = () => {
     const [movie, setMovie] = useState({});
+    const { jwtToken } = useOutletContext();
+    
     const handleBack = () => {
         window.history.back();
     }
+    
     let { id } = useParams();
 
     useEffect(() => {
@@ -30,11 +33,19 @@ const Movie = () => {
     return (
         <div className="bg-black h-screen w-full relative">
             <div className="w-full h-full">
-                {movie.video_path ? (
-                    <VideoPlayer path={movie.video_path} />
+                {!movie.id ? (
+                    <div className="flex items-center justify-center h-full text-white text-2xl">
+                        Loading...
+                    </div>
+                ) : movie.video_path ? (
+                    <VideoPlayer 
+                        path={movie.video_path} 
+                        movieId={id} 
+                        jwtToken={jwtToken}
+                    />
                 ) : (
                     <div className="flex items-center justify-center h-full text-white text-2xl">
-                        Bande-annonce non disponible
+                        Trailer not available
                     </div>
                 )}
             </div>

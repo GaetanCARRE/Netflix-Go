@@ -3,8 +3,6 @@ package main
 import (
 	"net/http"
 
-	"fmt"
-
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 )
@@ -38,6 +36,14 @@ func (app *application) routes() http.Handler {
 		mux.Delete("/{movie_id}", app.RemoveFromList)
 	})
 
+	mux.Route("/progress", func(mux chi.Router) {
+		mux.Use(app.authRequired)
+		mux.Get("/{movie_id}", app.GetProgress)
+		mux.Post("/{movie_id}", app.SaveProgress)
+	})
+
+	mux.Get("/me", app.authRequired(http.HandlerFunc(app.GetCurrentUser)).ServeHTTP)
+
 	mux.Route("/admin", func(mux chi.Router) {
 		mux.Use(app.authRequired)
 		mux.Get("/movies", app.MovieCatalog)
@@ -46,10 +52,9 @@ func (app *application) routes() http.Handler {
 		mux.Patch("/movies/{id}", app.UpdateMovie)
 		mux.Delete("/movies/{id}", app.DeleteMovie)
 	})
-	mux.Get("/videos/{name}", func(w http.ResponseWriter, r *http.Request) {
-		name := chi.URLParam(r, "name")
-		http.ServeFile(w, r, fmt.Sprintf("videos/%s", name))
-	})
+
+	// Video file server with CORS and Range support
+	mux.Handle("/videos/*", http.StripPrefix("/videos/", http.FileServer(http.Dir("videos"))))
 
 	return mux
 }

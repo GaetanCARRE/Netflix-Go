@@ -23,4 +23,6 @@ type DatabaseRepo interface {
 	GetUserList(userID int) ([]*models.Movie, error)
 	AddToList(userID int, movieID int) error
 	RemoveFromList(userID int, movieID int) error
+	GetProgress(userID int, movieID int) (int, int, error)
+	SaveProgress(userID int, movieID int, progressSeconds int, totalSeconds int) error
 }

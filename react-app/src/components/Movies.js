@@ -24,7 +24,7 @@ const Movies = () => {
         fetch(`/movies`, requestOptions)
             .then(response => response.json())
             .then(data => {
-                const filtered = data.filter(m => !m.type || m.type !== 'series');
+                const filtered = data.filter(m => m.type === 'movie' || !m.type);
                 setMovies(filtered);
             })
             .catch(error => console.log(error));
@@ -40,9 +40,9 @@ const Movies = () => {
     return (
         <>
             <Header />
-
             <div className="py-6 px-12">
-                <div className="relative">
+                <h1 className="text-4xl text-white font-bold mb-6">Movies</h1>
+                <div className="relative mb-6">
                     <button
                         className="flex items-center gap-2 border border-gray-600 rounded-full px-5 py-2 text-gray-300 hover:bg-gray-800 transition"
                         onClick={() => setShowGenres(!showGenres)}
@@ -62,6 +62,7 @@ const Movies = () => {
                                         genres: genres
                                     }}
                                     className="px-3 py-2 text-sm text-gray-300 hover:bg-red-600 hover:text-white rounded-lg transition text-center"
+                                    onClick={() => setShowGenres(false)}
                                 >
                                     {g.genre}
                                 </Link>
@@ -70,7 +71,11 @@ const Movies = () => {
                     )}
                 </div>
                 
-                <MoviesMap movies={movies} />
+                {movies.length > 0 ? (
+                    <MoviesMap movies={movies} />
+                ) : (
+                    <p className="text-gray-400">No movies available</p>
+                )}
             </div>
         </>
     );

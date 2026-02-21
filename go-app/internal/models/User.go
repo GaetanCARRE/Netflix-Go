@@ -13,6 +13,7 @@ type User struct {
 	LastName  string    `json:"last_name"`
 	Email     string    `json:"email"`
 	Password  string    `json:"password"`
+	IsAdmin   bool      `json:"is_admin"`
 	CreatedAt time.Time `json:"-"`
 	UpdatedAt time.Time `json:"-"`
 }

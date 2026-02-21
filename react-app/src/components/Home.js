@@ -13,6 +13,9 @@ const Home = () => {
     const [isMuted, setIsMuted] = useState(true);
     const [clicked, setClicked] = useState(false);
     const [movies, setMovies] = useState([])
+    const [series, setSeries] = useState([])
+    const [genres, setGenres] = useState([])
+    const [latest, setLatest] = useState([])
 
     const handleMute = () => {
         setIsMuted(!isMuted);
@@ -48,9 +51,23 @@ const Home = () => {
             method: 'GET',
             headers: headers,
         };
-        fetch(`/latest?count=12`, requestOptions)
+        
+        fetch(`/movies`, requestOptions)
             .then(response => response.json())
-            .then(data => setMovies(data))
+            .then(data => {
+                setMovies(data.filter(m => m.type === 'movie' || !m.type));
+                setSeries(data.filter(m => m.type === 'series'));
+            })
+            .catch(error => console.log(error));
+        
+        fetch(`/genres`, requestOptions)
+            .then(response => response.json())
+            .then(data => setGenres(data))
+            .catch(error => console.log(error));
+        
+        fetch(`/latest?count=10`, requestOptions)
+            .then(response => response.json())
+            .then(data => setLatest(data))
             .catch(error => console.log(error));
     }, []);
 
@@ -100,13 +117,13 @@ const Home = () => {
                     </p>
                     <div className="flex gap-4">
                         <Link to={`/movies/${movie.id}`} className="flex items-center bg-white text-black px-8 py-3 rounded-md font-bold text-xl hover:bg-gray-200 transition">
-                            <FaPlay className="mr-3" /> Lecture
+                            <FaPlay className="mr-3" /> Play
                         </Link>
                         <button 
                             onClick={handleMovieClick}
                             className="flex items-center bg-gray-500 bg-opacity-50 text-white px-8 py-3 rounded-md font-bold text-xl hover:bg-opacity-40 transition"
                         >
-                            <LuInfo className="mr-3" /> Plus d'infos
+                            <LuInfo className="mr-3" /> More Info
                         </button>
                     </div>
                 </div>
@@ -119,9 +136,40 @@ const Home = () => {
                 </button>
             </div>
 
-            <div className="px-12 -mt-20 relative z-20 pb-20">
-                <h2 className='text-2xl font-semibold mb-6 text-gray-400 uppercase tracking-widest'>Nouveautés</h2>
-                <MoviesMap movies={movies} />
+            <div className="px-12 -mt-20 relative z-20 pb-20 space-y-12">
+                {latest.length > 0 && (
+                    <section>
+                        <h2 className='text-2xl font-semibold mb-6 text-white'>New Releases</h2>
+                        <MoviesMap movies={latest} />
+                    </section>
+                )}
+                
+                {movies.length > 0 && (
+                    <section>
+                        <h2 className='text-2xl font-semibold mb-6 text-white'>Popular Movies</h2>
+                        <MoviesMap movies={movies} />
+                    </section>
+                )}
+                
+                {series.length > 0 && (
+                    <section>
+                        <h2 className='text-2xl font-semibold mb-6 text-white'>Popular Series</h2>
+                        <MoviesMap movies={series} />
+                    </section>
+                )}
+                
+                {genres.map(genre => {
+                    const genreMovies = [...movies, ...series].filter(m => 
+                        m.genres && m.genres.some(g => g.id === genre.id || g.ID === genre.id)
+                    );
+                    if (genreMovies.length === 0) return null;
+                    return (
+                        <section key={genre.id || genre.ID}>
+                            <h2 className='text-2xl font-semibold mb-6 text-white'>{genre.genre || genre.Genre}</h2>
+                            <MoviesMap movies={genreMovies} />
+                        </section>
+                    );
+                })}
             </div>
 
             {clicked && (

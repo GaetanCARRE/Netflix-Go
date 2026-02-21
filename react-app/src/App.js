@@ -5,10 +5,10 @@ import { HeaderProvider } from './components/HeaderContext';
 
 function App() {
   const [jwtToken, setJwtToken] = useState("");
+  const [isAdmin, setIsAdmin] = useState(false);
 
   const [tickInterval, setTickInterval] = useState();
   const toggleRefresh = useCallback((status) => {
-    console.log("clicked")
     if (status) {
       let i = setInterval(() => {
         const requestOptions = {
@@ -18,7 +18,6 @@ function App() {
         fetch(`/refresh`, requestOptions)
           .then(response => response.json())
           .then((data) => {
-            console.log(data)
             if (data.access_token) {
               setJwtToken(data.access_token);
             }
@@ -27,9 +26,7 @@ function App() {
           });
       }, 600000)
       setTickInterval(i);
-      console.log("setting tick interval to", i)
     } else {
-      console.log("turning off ticking")
       setTickInterval(null);
       clearInterval(tickInterval);
     }
@@ -44,7 +41,6 @@ function App() {
       fetch(`/refresh`, requestOptions)
         .then(response => response.json())
         .then((data) => {
-          console.log(data)
           if (data.access_token) {
             setJwtToken(data.access_token);
             toggleRefresh(true);
@@ -55,22 +51,37 @@ function App() {
     }
   }, [jwtToken, toggleRefresh])
 
-
-
-  console.log("Rendering App"); // Ajoutez cette console pour voir combien de fois le composant App est rendu
+  // Fetch user info including admin status
+  useEffect(() => {
+    if (jwtToken) {
+      fetch(`/me`, {
+        headers: {
+          'Authorization': `Bearer ${jwtToken}`
+        }
+      })
+        .then(response => response.json())
+        .then(data => {
+          setIsAdmin(data.is_admin || false);
+        })
+        .catch(() => {
+          setIsAdmin(false);
+        });
+    } else {
+      setIsAdmin(false);
+    }
+  }, [jwtToken]);
 
   return (
     <HeaderProvider>
       <main>
-        {/* Passer la prop isHomePage à Header */}
         <Outlet
           context={{
             jwtToken,
             setJwtToken,
             toggleRefresh,
+            isAdmin,
           }}
         />
-        {/* {location.pathname !== '/login' && !moviePathRegex.test(location.pathname) && <Header/>} */}
       </main>
     </HeaderProvider>
   );

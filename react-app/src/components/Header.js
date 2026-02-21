@@ -10,17 +10,15 @@ import { useHeaderContext } from './HeaderContext';
 export default function Header(props) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const navigate = useNavigate();
-  const { jwtToken, setJwtToken, toggleRefresh } = useOutletContext();
+  const { jwtToken, setJwtToken, toggleRefresh, isAdmin } = useOutletContext();
   const { searchClick, setSearchClick, prompt, setPrompt } = useHeaderContext();
   const promptInputRef = useRef(null);
- 
 
   useEffect(() => {
     if (searchClick) {
-      promptInputRef.current.focus();
+      promptInputRef.current?.focus();
     }
   }, [searchClick]);
-
 
   const logout = () => {
     const requestOptions = {
@@ -40,23 +38,14 @@ export default function Header(props) {
   }
 
   const searchMovie = (prompt) => {
-    console.log("searching for", prompt)
     if (window.location.pathname !== '/search') {
       navigate('/search');
     }
     setPrompt(prompt);
     if (prompt === '') {
-      console.log("prompt is empty")
-      // setSearchClick(false);
       navigate('/');
     }
-    // check if page is already on search page
-    
-
   }
-
-
-
 
   return (
     <header className={`bg-stone-900 ${props.className}`}>
@@ -78,38 +67,31 @@ export default function Header(props) {
           </button>
         </div>
         <Popover.Group className="hidden lg:flex lg:gap-x-12">
-          <Link to="/series" className="text-sm leading-6">
+          <Link to="/series" className="text-sm font-medium text-gray-300 hover:text-white transition">
             Series
           </Link>
-          <Link to="/movies" className="text-sm leading-6">
+          <Link to="/movies" className="text-sm font-medium text-gray-300 hover:text-white transition">
             Movies
           </Link>
-          <Link to="/new" className="text-sm leading-6">
-            New
+          <Link to="/mylist" className="text-sm font-medium text-gray-300 hover:text-white transition">
+            My List
           </Link>
-          <Link to="/mylist" className="text-sm leading-6">
-            My list
-          </Link>
-          {jwtToken !== '' ? (
+          {isAdmin && (
             <>
-              <Link to="/manage-catalog" className="text-sm leading-6">
-                Manage catalog
-              </Link>
-              <Link to="/admin/movie/0" className="text-sm leading-6">
-                Add movie
+              <Link to="/manage-catalog" className="text-sm font-medium text-red-500 hover:text-red-400 transition">
+                Admin
               </Link>
             </>
-          ) : null}
+          )}
         </Popover.Group>
         <div className="hidden lg:flex lg:flex-1 lg:justify-end lg:items-center gap-5">
-          {/* search */}
           {searchClick ? (
             <div className='flex items-center border-2 border-gray-400 bg-transparent rounded-xl px-4 py-2'>
               <input
                 type="text"
                 value={prompt}
-                placeholder="Enter a movie"
-                className='bg-transparent outline-none'
+                placeholder="Search..."
+                className='bg-transparent outline-none text-white w-40'
                 ref={promptInputRef}
                 onChange={(e) => searchMovie(e.target.value)}
               />
@@ -117,76 +99,77 @@ export default function Header(props) {
             </div>
           ) : (
             <IoSearch
-              className="text-white"
+              className="text-white text-xl cursor-pointer hover:text-gray-300 transition"
               onClick={() => setSearchClick(!searchClick)}
             />
           )}
 
-          {/* login */}
           {jwtToken === '' ? (
-            <Link to="/login" className="text-sm leading-6">
-              Log in <span aria-hidden="true">&rarr;</span>
+            <Link to="/login" className="text-sm font-medium text-gray-300 hover:text-white transition">
+              Login
             </Link>
           ) : (
-            <div className="text-sm leading-6" onClick={logout}>
-              Log out <span aria-hidden="true">&rarr;</span>
-            </div>
+            <button onClick={logout} className="text-sm font-medium text-gray-300 hover:text-white transition">
+              Logout
+            </button>
           )}
-
         </div>
       </nav>
       <Dialog as="div" className="lg:hidden" open={mobileMenuOpen} onClose={setMobileMenuOpen}>
-        <div className="fixed inset-0 z-10" />
-        <Dialog.Panel className="fixed inset-y-0 right-0 z-10 w-full overflow-y-auto bg-stone-900 px-6 py-6 sm:max-w-sm sm:ring-1 sm:ring-gray-900/10">
+        <div className="fixed inset-0 z-10 bg-black bg-opacity-50" />
+        <Dialog.Panel className="fixed inset-y-0 right-0 z-10 w-full overflow-y-auto bg-stone-900 px-6 py-6 sm:max-w-sm">
           <div className="flex items-center justify-between">
-            <Link to="#" className="-m-1.5 p-1.5">
-              <span className="sr-only">GoFlix</span>
-              <img
-                className="h-8 w-auto"
-                src={logo}
-                alt="logo"
-              />
+            <Link to="/" className="-m-1.5 p-1.5" onClick={() => setMobileMenuOpen(false)}>
+              <img className="h-8 w-auto" src={logo} alt="logo" />
             </Link>
             <button
               type="button"
-              className="-m-2.5 rounded-md p-2.5 text-gray-700"
+              className="-m-2.5 rounded-md p-2.5 text-gray-400"
               onClick={() => setMobileMenuOpen(false)}
             >
-              <CgClose className='text-white' />
-              <span className="sr-only">Close menu</span>
+              <CgClose className='text-white text-xl' />
             </button>
           </div>
           <div className="mt-6 flow-root">
-            <div className="-my-6 divide-y divide-gray-500/10">
+            <div className="-my-6 divide-y divide-gray-700">
               <div className="space-y-2 py-6">
-
-                <Link to="/series"
-                  className="-mx-3 block rounded-lg px-3 py-2 text-base leading-7 hover:bg-gray-50"
+                <Link to="/series" onClick={() => setMobileMenuOpen(false)}
+                  className="-mx-3 block rounded-lg px-3 py-2 text-base text-gray-300 hover:text-white hover:bg-stone-800"
                 >
                   Series
                 </Link>
-                <Link to="/movies"
-                  className="-mx-3 block rounded-lg px-3 py-2 text-base leading-7 hover:bg-gray-50"
+                <Link to="/movies" onClick={() => setMobileMenuOpen(false)}
+                  className="-mx-3 block rounded-lg px-3 py-2 text-base text-gray-300 hover:text-white hover:bg-stone-800"
                 >
                   Movies
                 </Link>
-                <Link to="New"
-                  className="-mx-3 block rounded-lg px-3 py-2 text-base leading-7 hover:bg-gray-50"
+                <Link to="/mylist" onClick={() => setMobileMenuOpen(false)}
+                  className="-mx-3 block rounded-lg px-3 py-2 text-base text-gray-300 hover:text-white hover:bg-stone-800"
                 >
-                  New
+                  My List
                 </Link>
-                <Link to="/mylist"
-                  className="-mx-3 block rounded-lg px-3 py-2 text-base leading-7 hover:bg-gray-50"
-                >
-                  My list
-                </Link>
+                {isAdmin && (
+                  <Link to="/manage-catalog" onClick={() => setMobileMenuOpen(false)}
+                    className="-mx-3 block rounded-lg px-3 py-2 text-base text-red-500 hover:text-red-400 hover:bg-stone-800"
+                  >
+                    Admin
+                  </Link>
+                )}
               </div>
               <div className="py-6">
-                <Link to="/login"
-                  className="-mx-3 block rounded-lg px-3 py-2.5 text-base leading-7 hover:bg-gray-50"
-                >
-                  Log in
-                </Link>
+                {jwtToken === '' ? (
+                  <Link to="/login" onClick={() => setMobileMenuOpen(false)}
+                    className="-mx-3 block rounded-lg px-3 py-2.5 text-base text-gray-300 hover:text-white hover:bg-stone-800"
+                  >
+                    Login
+                  </Link>
+                ) : (
+                  <button onClick={() => { logout(); setMobileMenuOpen(false); }}
+                    className="-mx-3 block rounded-lg px-3 py-2.5 text-base text-gray-300 hover:text-white hover:bg-stone-800"
+                  >
+                    Logout
+                  </button>
+                )}
               </div>
             </div>
           </div>

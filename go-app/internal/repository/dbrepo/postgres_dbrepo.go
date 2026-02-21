@@ -303,7 +303,7 @@ func (m *PostgresDBRepo) GetUserByEmail(email string) (*models.User, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), dbTimeout)
 	defer cancel()
 
-	query := `select id, email, first_name, last_name, password,
+	query := `select id, email, first_name, last_name, password, is_admin,
 			created_at, updated_at from users where email = $1`
 
 	var user models.User
@@ -315,6 +315,7 @@ func (m *PostgresDBRepo) GetUserByEmail(email string) (*models.User, error) {
 		&user.FirstName,
 		&user.LastName,
 		&user.Password,
+		&user.IsAdmin,
 		&user.CreatedAt,
 		&user.UpdatedAt,
 	)
@@ -330,7 +331,7 @@ func (m *PostgresDBRepo) GetUserByID(id int) (*models.User, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), dbTimeout)
 	defer cancel()
 
-	query := `select id, email, first_name, last_name, password,
+	query := `select id, email, first_name, last_name, password, is_admin,
 			created_at, updated_at from users where id = $1`
 
 	var user models.User
@@ -342,6 +343,7 @@ func (m *PostgresDBRepo) GetUserByID(id int) (*models.User, error) {
 		&user.FirstName,
 		&user.LastName,
 		&user.Password,
+		&user.IsAdmin,
 		&user.CreatedAt,
 		&user.UpdatedAt,
 	)
@@ -610,6 +612,7 @@ func (m *PostgresDBRepo) GetUserList(userID int) ([]*models.Movie, error) {
 			}
 			genres = append(genres, &g)
 		}
+
 		movie.Genres = genres
 
 		movies = append(movies, &movie)
@@ -618,6 +621,37 @@ func (m *PostgresDBRepo) GetUserList(userID int) ([]*models.Movie, error) {
 	return movies, nil
 }
 
+func (m *PostgresDBRepo) GetProgress(userID int, movieID int) (int, int, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), dbTimeout)
+	defer cancel()
+
+	query := `SELECT progress_seconds, total_seconds FROM user_movie_progress 
+	          WHERE user_id = $1 AND movie_id = $2`
+
+	var progress, total int
+	err := m.DB.QueryRowContext(ctx, query, userID, movieID).Scan(&progress, &total)
+	if err == sql.ErrNoRows {
+		return 0, 0, nil
+	}
+	if err != nil {
+		return 0, 0, err
+	}
+
+	return progress, total, nil
+}
+
+func (m *PostgresDBRepo) SaveProgress(userID int, movieID int, progressSeconds int, totalSeconds int) error {
+	ctx, cancel := context.WithTimeout(context.Background(), dbTimeout)
+	defer cancel()
+
+	query := `INSERT INTO user_movie_progress (user_id, movie_id, progress_seconds, total_seconds, updated_at)
+	          VALUES ($1, $2, $3, $4, NOW())
+	          ON CONFLICT (user_id, movie_id) 
+	          DO UPDATE SET progress_seconds = $3, total_seconds = $4, updated_at = NOW()`
+
+	_, err := m.DB.ExecContext(ctx, query, userID, movieID, progressSeconds, totalSeconds)
+	return err
+}
 func (m *PostgresDBRepo) AddToList(userID int, movieID int) error {
 	ctx, cancel := context.WithTimeout(context.Background(), dbTimeout)
 	defer cancel()

@@ -20,7 +20,7 @@ const Series = () => {
         fetch(`/movies`, requestOptions)
             .then(response => response.json())
             .then(data => {
-                const filtered = data.filter(m => m.type === 'series' || m.title.includes('House') || m.title.includes('Game') || m.title.includes('Stranger') || m.title.includes('Breaking') || m.title.includes('Witcher') || m.title.includes('Money') || m.title.includes('Wednesday') || m.title.includes('Dark') || m.title.includes('Crown') || m.title.includes('Ozark') || m.title.includes('Narcos') || m.title.includes('Prison') || m.title.includes('Sherlock') || m.title.includes('Friends') || m.title.includes('Office') || m.title.includes('Better') || m.title.includes('Boys') || m.title.includes('Arcane') || m.title.includes('Last'));
+                const filtered = data.filter(m => m.type === 'series');
                 setSeries(filtered);
             })
             .catch(error => console.log(error));
